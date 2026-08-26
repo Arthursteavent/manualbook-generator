@@ -1,0 +1,17 @@
+[Unit]
+Description=ManualArch Legacy HTML Version
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/aio/manualbook-generator/project/html-version
+
+# We use python3's built-in HTTP server to serve static files securely
+ExecStart=/usr/bin/env python3 -m http.server 3002
+Restart=on-failure
+RestartSec=5
+
+
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,18 @@
+[Unit]
+Description=ManualArch React Version
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/aio/manualbook-generator/project/react-version
+
+# Using Vite's preview server to serve the built static app on port 3001
+# Note: npm run preview maps to `vite preview` which safely handles SPA routing
+ExecStart=/usr/bin/env npm run preview -- --port 3001 --host
+Restart=on-failure
+RestartSec=5
+
+
+
+[Install]
+WantedBy=multi-user.target

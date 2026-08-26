@@ -1,0 +1,13 @@
+[Unit]
+Description=Manualbook Generator AW PHP Server
+After=network.target
+
+[Service]
+Type=simple
+User=aio
+WorkingDirectory=/home/aio/manualbook-generator/Aw
+ExecStart=/usr/bin/php -S 0.0.0.0:3111
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ManualArch | Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary": "#ffffff",
+                        "surface": "#0a0a0c",
+                        "secondary": "#ff2d78",
+                        "inverse-on-surface": "#191c1e",
+                        "on-error-container": "#ffdad6",
+                        "primary": "#ff2d78",
+                        "inverse-primary": "#000000",
+                        "background": "#050505",
+                        "outline": "#3f3f46",
+                        "inverse-surface": "#f7f9fb",
+                        "error-container": "#93000a",
+                        "secondary-fixed": "#3d0016",
+                        "surface-variant": "#1e1e22",
+                        "on-surface": "#f2f4f6",
+                        "on-secondary-fixed-variant": "#ff2d78",
+                        "on-tertiary-container": "#b7c8e1",
+                        "surface-bright": "#1a1a1e",
+                        "surface-container-low": "#111114",
+                        "on-secondary-fixed": "#ffdee7",
+                        "tertiary": "#ffffff",
+                        "surface-container-high": "#222226",
+                        "on-tertiary-fixed": "#0b1c30",
+                        "primary-container": "#1e000d",
+                        "on-secondary-container": "#ffffff",
+                        "on-error": "#ffffff",
+                        "secondary-fixed-dim": "#ff2d78",
+                        "outline-variant": "#27272a",
+                        "primary-fixed-dim": "#ff2d78",
+                        "on-primary-fixed": "#1e000d",
+                        "surface-dim": "#0a0a0c",
+                        "surface-container-lowest": "#000000",
+                        "tertiary-fixed": "#d3e4fe",
+                        "tertiary-fixed-dim": "#b7c8e1",
+                        "on-primary-container": "#ffdee7",
+                        "on-primary": "#ffffff",
+                        "surface-container-highest": "#2a2a2f",
+                        "on-primary-fixed-variant": "#ff2d78",
+                        "secondary-container": "#1e000d",
+                        "surface-tint": "#ff2d78",
+                        "error": "#ffb4ab",
+                        "surface-container": "#18181b",
+                        "on-surface-variant": "#a1a1aa",
+                        "on-secondary": "#ffffff",
+                        "tertiary-container": "#0b1c30",
+                        "primary-fixed": "#ffdee7",
+                        "on-background": "#f2f4f6",
+                        "on-tertiary-fixed-variant": "#38485d"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "24px",
+                        "toolbar-height": "64px",
+                        "margin-mobile": "16px",
+                        "margin-desktop": "40px",
+                        "unit": "4px",
+                        "document-max-width": "850px",
+                        "sidebar-width": "280px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Sora"],
+                        "ui-label-md": ["Sora"],
+                        "ui-small": ["Sora"],
+                        "editor-body": ["Sora"],
+                        "headline-md": ["Sora"],
+                        "editor-title": ["Sora"],
+                        "display-lg-mobile": ["Sora"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                        "ui-label-md": ["14px", { "lineHeight": "20px", "fontWeight": "600" }],
+                        "ui-small": ["12px", { "lineHeight": "16px", "fontWeight": "400" }],
+                        "editor-body": ["18px", { "lineHeight": "30px", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "editor-title": ["32px", { "lineHeight": "44px", "fontWeight": "800" }],
+                        "display-lg-mobile": ["32px", { "lineHeight": "40px", "fontWeight": "800" }]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background-color: #050505;
+            font-family: 'Sora', sans-serif;
+            color: #f2f4f6;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .sidebar-active {
+            border-left: 4px solid #ff2d78;
+            padding-left: 1rem;
+            font-weight: 700;
+            color: #ff2d78;
+            background: rgba(255, 45, 120, 0.05);
+        }
+        .sidebar-inactive {
+            padding-left: 1.25rem;
+            color: #a1a1aa;
+        }
+        .glass-panel {
+            background: rgba(10, 10, 12, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 45, 120, 0.1);
+        }
+        .neon-glow {
+            box-shadow: 0 0 15px rgba(255, 45, 120, 0.3);
+        }
+        .neon-border {
+            border: 1px solid rgba(255, 45, 120, 0.2);
+        }
+        .document-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 24px;
+        }
+        /* My Projects compact list styles */
+        #projectsContainer { padding: 8px; max-height: 260px; }
+        #projectsList .project-item { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:8px; border-radius:8px; transition:background .15s; }
+        #projectsList .project-item:hover { background: rgba(255,255,255,0.03); }
+        .project-thumb { width:44px; height:44px; border-radius:8px; display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;background:linear-gradient(135deg,#ff5ec7,#ff80c5);flex-shrink:0 }
+        .project-meta { min-width:0; overflow:hidden }
+        .project-title { font-size:13px; font-weight:600; color:var(--on-surface, #e6eef8); white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
+        .project-sub { font-size:12px; color:rgba(226,232,240,0.7); white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
+        .btn-open { background:transparent; border:1px solid rgba(255,45,120,0.12); color:#ff2d78; padding:6px 8px; border-radius:6px; font-size:12px; cursor:pointer }
+        /* Custom scrollbar for My Projects and sidebar */
+        /* WebKit browsers */
+        #projectsContainer::-webkit-scrollbar,
+        #projectsList::-webkit-scrollbar,
+        aside::-webkit-scrollbar {
+            width: 10px;
+        }
+        #projectsContainer::-webkit-scrollbar-track,
+        aside::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        #projectsContainer::-webkit-scrollbar-thumb,
+        #projectsList::-webkit-scrollbar-thumb,
+        aside::-webkit-scrollbar-thumb {
+            background: #ff2d78;
+            border-radius: 6px;
+            border: 2px solid rgba(0,0,0,0.15);
+        }
+        #projectsContainer::-webkit-scrollbar-thumb:hover,
+        #projectsList::-webkit-scrollbar-thumb:hover,
+        aside::-webkit-scrollbar-thumb:hover {
+            background: #ff5593;
+        }
+        /* Firefox */
+        #projectsContainer, #projectsList, aside {
+            scrollbar-width: thin;
+            scrollbar-color: #ff2d78 transparent;
+        }
+    </style>
+</head>
+<body class="text-on-surface bg-background">
+<!-- Side Navigation Shell -->
+<aside class="w-sidebar-width h-full fixed left-0 top-0 bg-surface-container-lowest border-r border-outline-variant flex flex-col py-6 z-30">
+<div class="px-6 mb-8">
+<h1 class="font-display-lg text-headline-md font-extrabold text-primary tracking-tight">ManualArch</h1>
+<p class="font-ui-label-md text-on-surface-variant text-ui-small uppercase tracking-widest opacity-80">Technical Documentation</p>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center sidebar-active font-ui-label-md text-ui-label-md cursor-pointer duration-200 transition-colors py-3" href="#">
+<span class="material-symbols-outlined mr-3">dashboard</span>
+            Dashboard
+        </a>
+<div>
+    <a id="myManualsToggle" class="flex items-center sidebar-inactive font-ui-label-md text-ui-label-md cursor-pointer duration-200 hover:bg-surface-container-low hover:text-on-surface transition-colors py-3" href="javascript:void(0);" onclick="toggleMyManuals()">
+        <span class="material-symbols-outlined mr-3">menu_book</span>
+        My Manuals
+    </a>
+    <div id="myManualsMenu" class="pl-8 space-y-2 hidden" style="padding-bottom: 8px;">
+        <div class="flex items-center gap-3 cursor-pointer p-2 rounded hover:bg-surface-container-high" onclick="openPortraitTemplate()">
+            <div class="w-8 h-10 bg-background border border-outline-variant rounded flex items-center justify-center text-lg">📱</div>
+            <div>
+                <div class="font-bold text-sm">Potret (Portrait)</div>
+                <div class="text-xs text-on-surface-variant">Buka template potret</div>
+            </div>
+        </div>
+        <div class="flex items-center gap-3 cursor-pointer p-2 rounded hover:bg-surface-container-high" onclick="startLandscape()">
+            <div class="w-10 h-8 bg-background border border-outline-variant rounded flex items-center justify-center text-lg">🖥️</div>
+            <div>
+                <div class="font-bold text-sm">Landscape</div>
+                <div class="text-xs text-on-surface-variant">Buka template landscape</div>
+            </div>
+        </div>
+    </div>
+</div>
+    <div class="mt-1">
+    <a id="myProjectsToggle" class="flex items-center sidebar-inactive font-ui-label-md text-ui-label-md cursor-pointer duration-200 hover:bg-surface-container-low hover:text-on-surface transition-colors py-2" href="javascript:void(0);" onclick="toggleMyProjects()">
+        <span class="material-symbols-outlined mr-3">article</span>
+        My Projects
+    </a>
+    <div class="px-4 pb-4">
+        <div id="projectsContainer" class="glass-panel rounded-md p-2 mt-2 hidden" style="height:160px;overflow-y:auto;overflow-x:hidden;">
+            <div id="projectsList" class="space-y-2 text-sm text-on-surface-variant">
+                <div class="text-ui-small text-on-surface-variant">Memuat proyek...</div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Settings link removed per user request -->
+</nav>
+<div class="px-6 mt-auto">
+<button id="asideNewManualBtn" onclick="showNewManualModal(event)" class="w-full bg-secondary text-on-secondary py-3 px-4 rounded-lg font-bold text-ui-label-md hover:opacity-90 transition-all flex items-center justify-center gap-2 neon-glow">
+<span class="material-symbols-outlined text-[20px]">add</span>
+            New Manual
+        </button>
+</div>
+</aside>
+<!-- Main Content Area -->
+<div class="ml-sidebar-width flex flex-col min-h-screen">
+<!-- Top Navigation Shell -->
+<header class="h-toolbar-height sticky top-0 bg-surface-container-lowest/80 backdrop-blur-md border-b border-outline-variant flex justify-between items-center px-gutter w-full z-20">
+<div class="flex items-center gap-4 flex-1 max-w-xl">
+<div class="relative w-full">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="w-full bg-surface-container-low border border-outline-variant rounded-lg pl-10 pr-4 py-2 text-ui-label-md focus:ring-2 focus:ring-secondary/50 outline-none transition-all placeholder:text-on-surface-variant/50" placeholder="Search manuals..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-4">
+<button class="text-on-surface-variant hover:text-secondary transition-all active:scale-95">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="text-on-surface-variant hover:text-secondary transition-all active:scale-95">
+<span class="material-symbols-outlined">help_outline</span>
+</button>
+</div>
+<div class="h-8 w-[1px] bg-outline-variant"></div>
+<div class="flex items-center gap-3">
+<div class="text-right hidden sm:block">
+</div>
+</div>
+</div>
+</header>
+<!-- Dashboard Canvas -->
+<main class="flex-1 p-margin-desktop space-y-10 max-w-[1400px]">
+<!-- Welcome Header -->
+<section class="relative overflow-hidden rounded-xl bg-primary-container p-10 text-on-primary border border-secondary/20">
+<div class="relative z-10 max-w-2xl">
+<h2 class="font-display-lg text-display-lg leading-tight mb-2 text-white">Welcome back</h2>
+<p class="text-on-primary-container font-ui-label-md text-ui-label-md mb-8 max-w-lg opacity-90">Ready to draft your next technical masterpiece? Start from a blank slate or pick up where you left off in your recent projects.</p>
+<div class="flex gap-4">
+<button class="bg-secondary text-white px-6 py-3 rounded-lg font-bold flex items-center gap-2 hover:opacity-90 transition-colors neon-glow">
+<span class="material-symbols-outlined">edit_square</span>
+                        Create New Manual
+                    </button>
+                    
+                    <!-- open modal instead of direct create -->
+                    <script>
+                        // Replace existing Create New Manual button behavior to open modal
+                        document.addEventListener('DOMContentLoaded', function(){
+                            const welcomeBtn = document.querySelector('.bg-secondary.text-white.px-6.py-3.rounded-lg');
+                            if(welcomeBtn){
+                                welcomeBtn.addEventListener('click', showNewManualModal);
+                            }
+                        });
+                    </script>
+<button class="bg-white/5 backdrop-blur-sm text-white border border-white/20 px-6 py-3 rounded-lg font-bold hover:bg-white/10 transition-colors">
+                        Browse Templates
+                    </button>
+</div>
+</div>
+<!-- Abstract Background Pattern -->
+<div class="absolute right-0 top-0 h-full w-1/2 opacity-30 pointer-events-none bg-gradient-to-l from-secondary/20 to-transparent">
+</div>
+</section>
+<!-- Quick Start: Orientation -->
+<section class="space-y-6">
+<div class="flex items-center justify-between">
+<h3 class="font-headline-md text-headline-md text-on-surface">Quick Start</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<!-- Portrait Option -->
+<div class="group cursor-pointer border border-outline-variant bg-surface-container-lowest rounded-xl p-8 hover:border-secondary hover:bg-surface-container-low transition-all">
+<div class="flex gap-8 items-start">
+<div class="w-32 h-44 bg-surface-container-high border border-outline-variant rounded relative overflow-hidden group-hover:scale-[1.02] transition-transform">
+<div class="absolute top-4 left-4 right-4 h-2 bg-secondary/20 rounded"></div>
+<div class="absolute top-8 left-4 right-8 h-2 bg-secondary/20 rounded"></div>
+<div class="absolute top-12 left-4 right-4 h-24 bg-secondary/5 rounded"></div>
+</div>
+<div class="flex-1">
+<span class="bg-secondary/10 text-secondary text-[10px] uppercase font-extrabold px-2 py-1 rounded">Traditional</span>
+<h4 class="font-headline-md text-xl mt-3 mb-2 text-on-surface">Portrait Document</h4>
+<p class="text-on-surface-variant text-ui-small mb-6">Optimized for standard A4 manuals, policy documents, and step-by-step guides.</p>
+<button onclick="openPortraitTemplate()" class="text-secondary font-bold text-ui-label-md flex items-center gap-1 group-hover:gap-2 transition-all">
+                                Start Document <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Landscape Option -->
+<div class="group cursor-pointer border border-outline-variant bg-surface-container-lowest rounded-xl p-8 hover:border-secondary hover:bg-surface-container-low transition-all">
+<div class="flex gap-8 items-start">
+<div class="w-44 h-32 bg-surface-container-high border border-outline-variant rounded relative overflow-hidden group-hover:scale-[1.02] transition-transform">
+<div class="absolute top-4 left-4 right-4 h-2 bg-secondary/20 rounded"></div>
+<div class="absolute top-8 left-4 right-12 h-2 bg-secondary/20 rounded"></div>
+<div class="absolute top-12 left-4 right-4 h-16 bg-secondary/5 rounded"></div>
+</div>
+<div class="flex-1">
+<span class="bg-secondary/10 text-secondary text-[10px] uppercase font-extrabold px-2 py-1 rounded">Presentation</span>
+<h4 class="font-headline-md text-xl mt-3 mb-2 text-on-surface">Landscape Manual</h4>
+<p class="text-on-surface-variant text-ui-small mb-6">Best for technical diagrams, visual work instructions, and dashboard reports.</p>
+<button onclick="startLandscape()" class="text-secondary font-bold text-ui-label-md flex items-center gap-1 group-hover:gap-2 transition-all">
+                                Start Document <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+</main>
+
+<!-- New Manual Modal -->
+<div id="newManualModalOverlay" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-40">
+    <div class="bg-surface-container-lowest rounded-xl p-6 w-[380px] glass-panel">
+        <div class="flex items-center justify-between mb-4">
+            <h4 class="font-bold">Create New Manual</h4>
+            <button onclick="closeNewManualModal()" class="text-on-surface-variant">×</button>
+        </div>
+        <p class="text-ui-small text-on-surface-variant mb-4">Choose orientation and create a blank manual.</p>
+        <div class="flex gap-3 mb-4">
+            <button id="choicePortrait" onclick="selectOrientation('portrait')" class="flex-1 p-3 border border-outline-variant rounded-lg text-on-surface hover:border-secondary">📱 Portrait</button>
+            <button id="choiceLandscape" onclick="selectOrientation('landscape')" class="flex-1 p-3 border border-outline-variant rounded-lg text-on-surface hover:border-secondary">🖥️ Landscape</button>
+        </div>
+        <div class="flex justify-end gap-3">
+            <button onclick="closeNewManualModal()" class="px-4 py-2 rounded bg-transparent border border-outline-variant text-on-surface-variant">Cancel</button>
+            <button id="createManualBtn" onclick="createNewManual()" class="px-4 py-2 rounded bg-secondary text-white">Create New Manual</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let _selectedOrientation = 'portrait';
+    function showNewManualModal(e){
+        if(e && e.stopPropagation) e.stopPropagation();
+        const overlay = document.getElementById('newManualModalOverlay');
+        overlay.classList.remove('hidden');
+        overlay.classList.add('flex');
+        // set default selection
+        _selectedOrientation = 'portrait';
+        updateOrientationUI();
+    }
+    function closeNewManualModal(){
+        const overlay = document.getElementById('newManualModalOverlay');
+        overlay.classList.add('hidden');
+        overlay.classList.remove('flex');
+    }
+    function selectOrientation(o){
+        _selectedOrientation = o;
+        updateOrientationUI();
+    }
+    function updateOrientationUI(){
+        const p = document.getElementById('choicePortrait');
+        const l = document.getElementById('choiceLandscape');
+        if(_selectedOrientation==='portrait'){
+            p.classList.add('border-secondary');
+            l.classList.remove('border-secondary');
+        }else{
+            l.classList.add('border-secondary');
+            p.classList.remove('border-secondary');
+        }
+    }
+    function createNewManual(){
+        // navigate to the editor with template mode
+        closeNewManualModal();
+        if(_selectedOrientation==='portrait'){
+            window.location.href = 'new.html?mode=template&type=portrait';
+        } else {
+            window.location.href = 'landscape.html?mode=template&type=landscape';
+        }
+    }
+    // close modal when clicking overlay background
+    document.addEventListener('click', function(e){
+        const overlay = document.getElementById('newManualModalOverlay');
+        if(!overlay || overlay.classList.contains('hidden')) return;
+        const panel = overlay.querySelector('div');
+        if(panel && !panel.contains(e.target)){
+            closeNewManualModal();
+        }
+    });
+</script>
+</div>
+<!-- Floating Action for Mobile -->
+<button class="fixed bottom-6 right-6 w-14 h-14 bg-secondary text-on-secondary rounded-full flex items-center justify-center neon-glow md:hidden z-50 active:scale-95 transition-transform">
+<span class="material-symbols-outlined">add</span>
+</button>
+<script>
+    // Simple micro-interaction for cards
+    document.querySelectorAll('.document-grid > div').forEach(card => {
+        card.addEventListener('mouseenter', () => {
+            card.style.transform = 'translateY(-4px)';
+        });
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = 'translateY(0)';
+        });
+    });
+
+    // Sidebar interactions: My Manuals toggle and project list
+    function toggleMyManuals() {
+        const menu = document.getElementById('myManualsMenu');
+        if (!menu) return;
+        menu.classList.toggle('hidden');
+    }
+
+    function openPortraitTemplate() {
+        localStorage.removeItem('last_loaded_project');
+        localStorage.removeItem('current_project_id');
+        window.location.href = 'new.html?mode=template&type=portrait';
+    }
+
+    function startLandscape() {
+        localStorage.removeItem('last_loaded_project');
+        localStorage.removeItem('current_project_id');
+        window.location.href = 'landscape.html?mode=template&type=landscape';
+    }
+
+    // Load projects from server
+    async function loadProjects() {
+        const listEl = document.getElementById('projectsList');
+        if (!listEl) return;
+        listEl.innerHTML = '<div class="text-ui-small text-on-surface-variant">Memuat proyek...</div>';
+        try {
+            const res = await fetch('list_projects.php');
+            const data = await res.json();
+            if (!data.success) throw new Error('Gagal memuat');
+            const projects = data.projects || [];
+            if (projects.length === 0) {
+                listEl.innerHTML = '<div class="text-ui-small text-on-surface-variant">Belum ada proyek tersimpan</div>';
+                return;
+            }
+                        listEl.innerHTML = '';
+                        projects.forEach(p => {
+                                const item = document.createElement('div');
+                                item.className = 'project-item';
+                                const initials = (p.name || '').split(' ').map(s=>s[0]).filter(Boolean).slice(0,2).join('').toUpperCase();
+                                const created = p.created_at ? (new Date(p.created_at)).toLocaleDateString() : '';
+                                item.innerHTML = `
+                                    <div class="flex items-center gap-3 min-w-0">
+                                        <div class="project-thumb">${escapeHtml(initials)}</div>
+                                        <div class="project-meta">
+                                            <div class="project-title">${escapeHtml(p.name)}</div>
+                                            <div class="project-sub">${escapeHtml(p.id)}${created? ' • '+escapeHtml(created):''}</div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <button class="btn-open">Open</button>
+                                    </div>
+                                `;
+
+                                // Main click opens project
+                                item.addEventListener('click', () => openProject(p));
+
+                                // Button opens project (stop propagation)
+                                setTimeout(() => {
+                                    const btn = item.querySelector('.btn-open');
+                                    if (btn) btn.addEventListener('click', (e) => { e.stopPropagation(); openProject(p); });
+                                }, 0);
+
+                                listEl.appendChild(item);
+                        });
+        } catch (err) {
+            console.error(err);
+            listEl.innerHTML = '<div class="text-ui-small text-on-surface-variant">Gagal memuat proyek</div>';
+        }
+    }
+
+    function escapeHtml(str) {
+        return String(str).replace(/[&"'<>]/g, function (s) { return ({'&':'&amp;','"':'&quot;',"'":'&#39;','<':'&lt;','>':'&gt;'})[s]; });
+    }
+
+    function openProject(p) {
+        try {
+            localStorage.setItem('last_loaded_project', p.id);
+            localStorage.setItem('current_project_id', p.id);
+            try { localStorage.setItem('project_name_' + p.id, p.name); } catch (e) {}
+            // open project's index path (may be absolute to projects folder or local index.html)
+            window.location.href = p.index || ('projects/' + p.id + '/index.html');
+        } catch (err) {
+            console.error('Gagal membuka proyek', err);
+            alert('Gagal membuka proyek.');
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        loadProjects();
+        // close menus when clicking outside (for inline toggles)
+        document.addEventListener('click', (e) => {
+            // My Manuals menu
+            const menu = document.getElementById('myManualsMenu');
+            const toggle = document.getElementById('myManualsToggle');
+            if (menu && toggle && !menu.contains(e.target) && !toggle.contains(e.target)) {
+                menu.classList.add('hidden');
+            }
+            // My Projects container
+            const projects = document.getElementById('projectsContainer');
+            const projectsToggle = document.getElementById('myProjectsToggle');
+            if (projects && projectsToggle && !projects.contains(e.target) && !projectsToggle.contains(e.target)) {
+                projects.classList.add('hidden');
+            }
+        });
+    });
+
+    function toggleMyProjects() {
+        const projects = document.getElementById('projectsContainer');
+        if (!projects) return;
+        projects.classList.toggle('hidden');
+    }
+</script>
+</body></html>

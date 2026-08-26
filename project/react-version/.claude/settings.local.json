@@ -1,0 +1,35 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 make_guide.py)",
+      "Bash(python3 *)",
+      "Bash(npx tsc *)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code} %{size_download} bytes, content-disposition: %{filename_effective}\\\\n\" -D - http://127.0.0.1:3002/api/download-word-instruction)",
+      "Bash(systemctl status *)",
+      "Bash(npm run *)",
+      "Bash(systemctl --user restart manualarch-react)",
+      "Bash(curl -s -D - -o /dev/null http://127.0.0.1:3002/api/download-word-instruction)",
+      "Bash(curl -s -o /dev/null -w \"preview 3001: %{http_code}\\\\n\" http://127.0.0.1:3001/)",
+      "Bash(curl -s -o /dev/null -w \"preview: %{http_code}, download: \" http://127.0.0.1:3001/)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://127.0.0.1:3002/api/download-word-instruction)",
+      "Bash(node --check /home/aio/manualbook-generator/project/react-version/server.js)",
+      "Bash(sudo -n systemctl restart manualarch-react.service)",
+      "Bash(journalctl -u manualarch-react.service --since \"2026-08-18\" --no-pager)",
+      "Bash(journalctl -u manualarch-react.service --since \"2026-08-14\" --no-pager)",
+      "Bash(journalctl -u manualarch-react.service --since \"2026-08-20 17:25\" --until \"2026-08-20 17:40\" --no-pager)",
+      "Bash(journalctl -u manualarch-react.service --since \"2026-08-21 10:30\" --no-pager)",
+      "Bash(awk 'NR>3083 && \\(/onClick=/ || /onMouseDown=/ || /TextEditorModal/\\)' /home/aio/manualbook-generator/project/react-version/src/components/editor/HtmlDocViewer.tsx)",
+      "Bash(sort -t: -k3)",
+      "Bash(uniq -c -f2)",
+      "Bash(journalctl -u manualarch-react.service --since \"2026-08-21 10:45\" --no-pager)",
+      "Bash(journalctl -u manualarch-react.service --since \"2026-08-21 10:00\" --no-pager)",
+      "Read(//home/aio/manualbook-generator/**)",
+      "Read(//home/aio/**)",
+      "Bash(pm2 list *)",
+      "Bash(journalctl -u manualarch-react.service --since \"today 15:00\" --no-pager)",
+      "Bash(journalctl --user -u manualarch-react.service --since \"today 16:30\" --no-pager)",
+      "Bash(journalctl -u manualarch-react.service --since \"today 16:50\" --no-pager)",
+      "Bash(journalctl -u manualarch-react.service --since \"2026-08-21 17:00:00\" --no-pager)"
+    ]
+  }
+}

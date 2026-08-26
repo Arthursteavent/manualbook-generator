@@ -1,0 +1,3596 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Commandr Signa PhoneBank – Manual Book</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#0f1117;color:#e2e8f0;min-height:100vh}
+.toolbar{position:fixed;top:0;left:0;right:0;z-index:999;background:rgba(15,17,23,0.95);backdrop-filter:blur(12px);border-bottom:1px solid rgba(0,210,255,0.15);padding:12px 32px;display:flex;align-items:center;justify-content:space-between}
+.toolbar-brand{display:flex;align-items:center;gap:10px}
+.toolbar-brand .dot{width:8px;height:8px;border-radius:50%;background:linear-gradient(135deg,#00d2ff,#00e676)}
+.toolbar-brand span{font-size:13px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#00d2ff}
+.toolbar-actions{display:flex;gap:10px}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:8px 18px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-weight:500;font-family:'Inter',sans-serif;transition:all .2s}
+.btn-pdf{background:linear-gradient(135deg,#00d2ff,#00b8d4);color:#fff}
+.btn-pdf:hover{opacity:.85;transform:translateY(-1px)}
+.btn-pdf:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.pdf-pages{padding:80px 0 40px;display:flex;flex-direction:column;align-items:center;gap:0}
+
+/* Konfigurasi Halaman PDF */
+.page{width:794px;min-height:1122px;height:auto;background:#fff;color:#1a202c;position:relative;overflow:visible !important;page-break-after:always}
+
+/* Cover */
+.page-cover{position:relative;overflow:hidden;background:linear-gradient(145deg,#0a0e1a 0%,#091b24 100%);color:#fff;display:flex;flex-direction:column;justify-content:space-between;padding:80px 72px}
+.page-cover::before{content:'';position:absolute;inset:0;pointer-events:none;background:none;mix-blend-mode:screen;opacity:0;z-index:1;}
+/* soft circular ring accents */
+.page-cover::after{content:'';position:absolute;inset:0;pointer-events:none;mix-blend-mode:screen;z-index:2;opacity:0;background:none;filter:none;}
+/* ensure cover content sits above overlays */
+.page-cover > * { position: relative; z-index: 3; }
+.cover-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(0,210,255,0.12);border:1px solid rgba(0,210,255,0.3);border-radius:20px;padding:6px 16px;font-size:11px;font-weight:600;letter-spacing:2px;color:#00d2ff;text-transform:uppercase}
+.cover-main{flex:1;display:flex;flex-direction:column;justify-content:center;padding:60px 0}
+.cover-eyebrow{font-size:13px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:#00d2ff;margin-bottom:16px}
+.cover-title{font-family:'Playfair Display',serif;font-size:52px;line-height:1.1;color:#fff;margin-bottom:8px}
+.cover-title span{background:linear-gradient(135deg,#00d2ff,#00e676);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.cover-sub{font-size:20px;font-weight:300;color:#a0aec0;margin-top:12px;letter-spacing:1px;line-height:1.5}
+.cover-divider{width:60px;height:3px;background:linear-gradient(90deg,#00d2ff,#00e676);margin:24px 0}
+.cover-footer{display:flex;justify-content:space-between;align-items:flex-end}
+.cover-logo-text{font-size:11px;font-weight:700;letter-spacing:3px;color:#4a5568;text-transform:uppercase}
+
+/* TOC (Daftar Isi) */
+.page-toc{background:#f8faff;padding:72px}
+.toc-header{margin-bottom:48px}
+.section-label{font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#00d2ff;margin-bottom:8px}
+.toc-title{font-family:'Playfair Display',serif;font-size:36px;color:#0f1117}
+.toc-divider{width:48px;height:3px;background:linear-gradient(90deg,#00d2ff,#00e676);margin-top:16px}
+.toc-list{list-style:none;display:flex;flex-direction:column;gap:4px}
+.toc-item{display:flex;align-items:center;padding:14px 20px;border-radius:10px;border:1px solid transparent;transition:.2s;cursor:default}
+.toc-item:nth-child(odd){background:#fff;border-color:#e8ecf8}
+.toc-num{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#00d2ff22,#00e67622);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#00b8d4;flex-shrink:0}
+.toc-name{flex:1;margin-left:16px;font-size:14px;font-weight:500;color:#2d3748}
+.toc-dot{flex:1;border-bottom:1px dashed #cbd5e0;margin:0 12px}
+.toc-page{font-size:12px;font-weight:600;color:#a0aec0}
+
+/* Content pages */
+.page-content{padding:72px}
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px;padding-bottom:16px;border-bottom:1px solid #e8ecf8}
+.page-header-left{display:flex;align-items:center;gap:12px}
+.chapter-num{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#00d2ff,#00b8d4);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff}
+.chapter-label{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#00d2ff}
+.chapter-name{font-size:14px;font-weight:600;color:#2d3748}
+.page-num-tag{display:none !important;}
+.section-title{font-family:'Playfair Display',serif;font-size:26px;color:#0f1117;margin-bottom:8px; margin-top:24px;}
+.section-accent{display:inline-block;width:36px;height:3px;background:linear-gradient(90deg,#00d2ff,#00e676);border-radius:2px;margin-bottom:16px}
+.body-text{font-size:13.5px;line-height:1.8;color:#4a5568;margin-bottom:16px}
+.body-subtitle{font-size:15px;font-weight:600;color:#2d3748;margin:24px 0 12px 0;}
+.body-cite{font-size:10px; color:#a0aec0; vertical-align:super;}
+
+/* Image Placeholders */
+.img-placeholder{width:100%;border-radius:12px;background:linear-gradient(135deg,#f0f4ff,#e8ecf8);border:2px dashed #c3cfe2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;cursor:pointer;position:relative;overflow:hidden;transition:.2s;margin:16px 0; break-inside:avoid;}
+.img-placeholder:hover{border-color:#00d2ff;background:linear-gradient(135deg,#e0f7fa,#e1f5fe)}
+.img-placeholder input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.img-placeholder .ph-label{font-size:12px;font-weight:600;color:#718096;letter-spacing:1px}
+.img-placeholder .ph-sub{font-size:11px;color:#a0aec0}
+.img-placeholder > img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#fff}
+.img-placeholder.has-image{border:none;background:transparent}
+
+.img-placeholder .img-preview-grid{position:absolute;inset:0;}
+.img-placeholder .img-preview-grid .img-grid-item img{position:relative !important; inset:auto !important; width:100% !important; height:100% !important; object-fit:cover !important; border-radius:12px 12px 0 0 !important; display:block !important;}
+
+.img-large { padding-top: 56.25%; /* 16:9 Aspect Ratio */ }
+.img-medium { padding-top: 40%; }
+.img-small { padding-top: 15%; width: 50%; margin: 16px auto; }
+.img-icon { width: 120px; height: 50px; margin: 10px 0; display: inline-block; vertical-align: middle; }
+
+/* Lists */
+.steps-list{list-style:none;padding-left:0;display:flex;flex-direction:column;gap:10px;margin:16px 0; break-inside:avoid;}
+.step-item{display:flex;align-items:flex-start;gap:12px;padding:12px 16px;background:#f8faff;border-radius:8px;border-left:3px solid #00d2ff;width:100%;box-sizing:border-box;}
+
+/* Two Columns Layout */
+.two-columns-layout-wrapper{position:relative;}
+.two-columns-layout{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0;background:rgba(0,210,255,0.05);border:1px dashed rgba(0,210,255,0.25);border-radius:10px; break-inside:avoid;align-items:stretch;}
+.two-columns-layout-wrapper .layout-toolbar{position:absolute;top:-10px;right:0;z-index:10;display:none;}
+.two-columns-layout-wrapper:hover .layout-toolbar{display:flex;}
+.two-columns-layout-wrapper .layout-toolbar .ctrl-btn.del-btn{padding:6px 10px;}
+.two-columns-layout .col{min-height:180px;background:#f8faff;border-radius:8px;border:1px dashed rgba(0,210,255,0.15);display:flex;flex-direction:column;gap:10px;position:relative;transition:.2s;align-self:stretch;}
+.two-columns-layout .col .column-placeholder{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#a0aec0;font-size:12px;pointer-events:none;}
+.two-columns-layout .col.has-content .column-placeholder{display:none;}
+.two-columns-layout .col .col-content{display:flex;flex-direction:column;gap:10px;z-index:1;width:100%;min-height:100%;flex:1;}
+.two-columns-layout .col.drag-hover{background:rgba(0,210,255,0.1);border-color:rgba(0,210,255,0.4)}
+.step-text{font-size:13px;color:#4a5568;line-height:1.6}
+
+/* Footer */
+.page-footer{position:absolute;bottom:32px;left:72px;right:72px;display:flex;justify-content:space-between;align-items:center;border-top:1px solid #e8ecf8;padding-top:16px}
+.footer-brand{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#c3cfe2}
+.footer-page{font-size:10px;font-weight:600;color:#a0aec0;letter-spacing:1px}
+
+/* Color Picker Dropdown styling */
+.color-picker-dropdown {
+  position: relative;
+  display: inline-block;
+}
+.btn-color {
+  background: rgba(255, 255, 255, 0.08);
+  color: #e2e8f0;
+  border: 1px solid rgba(0, 210, 255, 0.25);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.btn-color:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: #00d2ff;
+}
+.color-preview {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  display: inline-block;
+}
+.color-dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 8px;
+  background: rgba(15, 17, 23, 0.98);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(0, 210, 255, 0.25);
+  border-radius: 10px;
+  padding: 8px;
+  width: 190px;
+  z-index: 1000;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.6), 0 8px 10px -6px rgba(0, 0, 0, 0.6);
+}
+.color-dropdown-menu.show {
+  display: block;
+  animation: fadeInDown 0.15s ease-out;
+}
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.color-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  color: #cbd5e0;
+  transition: all 0.2s;
+  margin-bottom: 4px;
+}
+.color-option:last-child {
+  margin-bottom: 0;
+}
+.color-option:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.05);
+}
+.color-option.active {
+  background: rgba(0, 210, 255, 0.15);
+  border: 1px solid rgba(0, 210, 255, 0.3);
+  color: #fff;
+}
+.custom-color-option {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px dashed rgba(0, 210, 255, 0.2);
+}
+.custom-color-option:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: #00d2ff;
+}
+.custom-color-option input[type="color"] {
+  -webkit-appearance: none;
+  border: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  cursor: pointer;
+  background: none;
+  padding: 0;
+}
+.custom-color-option input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+.custom-color-option input[type="color"]::-webkit-color-swatch {
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 50%;
+}
+
+/* Custom gradient controls inside color menu */
+.custom-gradient-panel {
+  margin-top: 10px;
+  padding: 10px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.03);
+  display: none;
+  gap: 8px;
+  color: #e6eef6;
+  font-size: 13px;
+}
+.custom-gradient-panel.show { display: block; }
+.custom-gradient-row { display:flex; gap:8px; align-items:center; margin-bottom:8px; }
+.custom-gradient-row label { width:110px; color:#cbd5e1; font-size:12px; }
+.custom-gradient-controls { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+.corner-input { width:60px; }
+.custom-gradient-row label { width:110px; color:#cbd5e1; font-size:12px; }
+.custom-gradient-controls { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+.corner-input { width:60px; }
+.cover-style-panel {
+  margin-top: 14px;
+  padding: 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.03);
+  color: #e2e8f0;
+}
+.cover-style-panel .style-section-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #00d2ff;
+  margin-bottom: 10px;
+}
+.style-toggle-row,
+.style-slider-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.style-toggle-row label,
+.style-slider-row label {
+  font-size: 12px;
+  color: #cbd5e0;
+  flex: 1;
+}
+.style-toggle-row input[type="checkbox"] {
+  accent-color: #00d2ff;
+  margin-right: 6px;
+}
+.cover-style-panel input[type="range"] {
+  width: 100%;
+}
+.cover-style-panel .range-value {
+  min-width: 36px;
+  text-align: right;
+  color: #cbd5e0;
+  font-size: 12px;
+}
+.page-cover {
+  --cover-glow-strength: 0.57;
+  --cover-ring-size: 140px;
+  --cover-ring-color-1: rgba(0,210,255,0.24);
+  --cover-ring-color-2: rgba(0,210,255,0.24);
+}
+.cover-gradient-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  background: none;
+  mix-blend-mode: screen;
+}
+.page-cover.cover-glow-active .cover-gradient-layer {
+  opacity: 0;
+}
+.cover-glow-ring {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(22px);
+  opacity: 0;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  pointer-events: none;
+  z-index: 1;
+}
+.page-cover.cover-glow-active .cover-glow-ring {
+  opacity: 1;
+}
+.cover-ring-1 {
+  width: var(--cover-ring-size);
+  height: var(--cover-ring-size);
+  top: 10%;
+  right: 10%;
+  left: auto;
+  bottom: auto;
+  background: radial-gradient(circle, var(--cover-ring-color-1), transparent 52%);
+}
+.cover-ring-2 {
+  width: var(--cover-ring-size);
+  height: var(--cover-ring-size);
+  bottom: 10%;
+  left: 10%;
+  right: auto;
+  top: auto;
+  background: radial-gradient(circle, var(--cover-ring-color-2), transparent 52%);
+}
+.cover-ring-3 {
+  opacity: 0;
+}
+.page-cover.cover-style-premium .cover-badge,
+.page-cover.cover-style-premium .cover-eyebrow,
+.page-cover.cover-style-premium .cover-title span {
+  color: #9df9ff;
+}
+.page-cover.cover-style-vintage {
+  background: linear-gradient(145deg, #2b1e3f 0%, #1b1224 48%, #120f1b 100%);
+}
+.page-cover.cover-style-modern {
+  background: linear-gradient(145deg, #161b27 0%, #0f1626 45%, #202a3c 100%);
+}
+.page-cover.cover-style-vintage .cover-badge,
+.page-cover.cover-style-vintage .cover-eyebrow,
+.page-cover.cover-style-vintage .cover-title span {
+  color: #f4d47a;
+}
+.page-cover.cover-style-modern .cover-badge,
+.page-cover.cover-style-modern .cover-eyebrow,
+.page-cover.cover-style-modern .cover-title span {
+  color: #80d6ff;
+}
+.img-preview-grid {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  padding: 8px;
+}
+.img-preview-grid.single-img {
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
+  padding: 0;
+}
+.img-preview-grid.single-img > img,
+.img-preview-grid.single-img .img-grid-item img {
+  border: none;
+  border-radius: 12px;
+  background: #fff;
+}
+.img-preview-grid:has(.img-grid-item:nth-child(3)),
+.img-preview-grid:has(.img-grid-item:nth-child(4)),
+.img-preview-grid:has(img:nth-child(3)),
+.img-preview-grid:has(img:nth-child(4)) {
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+}
+
+/* Grid item: tiap gambar + captionnya */
+.img-grid-item {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #e8ecf8;
+}
+.img-grid-item img {
+  width: 100% !important;
+  flex: 1 1 0;
+  min-height: 0;
+  object-fit: cover !important;
+  border-radius: 12px 12px 0 0 !important;
+  display: block !important;
+}
+.img-grid-caption {
+  text-align: center;
+  font-size: 10px;
+  font-style: italic;
+  color: #718096;
+  padding: 6px 8px;
+  background: #f0f4ff;
+  border-top: 1px solid #e8eaf2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.6;
+}
+
+/* Reset Teks Button styling */
+.btn-reset {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: #ef4444;
+}
+.btn-reset:hover {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: #ef4444;
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+/* Hover highlight for editable text */
+.editable-text {
+  cursor: pointer;
+  position: relative;
+  transition: background-color 0.2s, outline 0.2s;
+}
+.editable-text:hover {
+  background-color: rgba(0, 210, 255, 0.08) !important;
+  outline: 1px dashed #00d2ff !important;
+  border-radius: 4px;
+}
+.editing-now {
+  outline: 2px solid #00d2ff !important;
+  background-color: rgba(0, 210, 255, 0.12) !important;
+  border-radius: 4px;
+}
+
+/* Edit Modal Card Overlay */
+.text-editor-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 17, 23, 0.75);
+  backdrop-filter: blur(8px);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+.text-editor-overlay.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Edit Modal Card */
+.text-editor-card {
+  background: #1e2230;
+  border: 1px solid rgba(0, 210, 255, 0.3);
+  border-radius: 16px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+  padding: 24px;
+  transform: scale(0.9);
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.text-editor-overlay.show .text-editor-card {
+  transform: scale(1);
+}
+
+.text-editor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.text-editor-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #00d2ff;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.text-editor-close {
+  background: none;
+  border: none;
+  color: #a0aec0;
+  cursor: pointer;
+  font-size: 24px;
+  line-height: 1;
+  transition: color 0.2s;
+}
+.text-editor-close:hover {
+  color: #fff;
+}
+
+.text-editor-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.text-editor-controls {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.text-editor-control {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  color: #cbd5e0;
+  min-width: 120px;
+}
+.text-editor-control span {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: #8aa4c1;
+}
+.text-editor-select {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: #151a29;
+  color: #e2e8f0;
+  font-family: 'Inter', sans-serif;
+}
+.text-editor-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: #121624;
+  color: #e2e8f0;
+  font-size: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.text-editor-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.text-editor-color-control {
+  min-width: 140px;
+}
+.text-editor-color {
+  width: 100%;
+  height: 38px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.12);
+  padding: 3px;
+  background: #0f1117;
+  cursor: pointer;
+}
+.text-editor-textarea {
+  width: 100%;
+  min-height: 120px;
+  background: #0f1117;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  padding: 12px;
+  color: #e2e8f0;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.2s;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+}
+.text-editor-textarea:focus {
+  border-color: #00d2ff;
+}
+.text-editor-textarea:empty:before {
+  content: attr(placeholder);
+  color: #718096;
+}
+.text-editor-hint {
+  font-size: 11px;
+  color: #718096;
+  line-height: 1.4;
+}
+
+.text-editor-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.btn-editor {
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+  font-family: 'Inter', sans-serif;
+}
+.btn-editor-cancel {
+  background: rgba(255,255,255,0.08);
+  color: #e2e8f0;
+}
+.btn-editor-cancel:hover {
+  background: rgba(255,255,255,0.15);
+}
+.btn-editor-save {
+  background: linear-gradient(135deg, #00d2ff, #00b8d4);
+  color: #fff;
+}
+.btn-editor-save:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+/* Caption otomatis di bawah gambar yang di-upload */
+.img-uploaded-caption {
+  display: block;
+  text-align: center;
+  font-size: 11.5px;
+  font-style: italic;
+  color: #718096;
+  margin-top: 6px;
+  margin-bottom: 8px;
+  letter-spacing: 0.3px;
+}
+
+/* Floating Action Button untuk Tambah Halaman */
+.btn-add-page-fab {
+  position: fixed;
+  bottom: 40px;
+  right: 40px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #00d2ff, #00b8d4);
+  color: #fff;
+  font-size: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 10px 20px rgba(0, 210, 255, 0.3);
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  z-index: 9999;
+}
+.btn-add-page-fab:hover {
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: 0 15px 25px rgba(0, 210, 255, 0.4);
+}
+.btn-add-page-fab:active {
+  transform: translateY(0) scale(0.95);
+}
+
+/* Element controls for dropped items */
+.deletable {
+  position: relative;
+}
+.element-controls {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: none;
+  gap: 4px;
+  z-index: 20;
+}
+.deletable:hover > .element-controls,
+.img-placeholder:hover > .element-controls,
+.step-item:hover > .element-controls {
+  display: flex;
+}
+.ctrl-btn {
+  background: rgba(255, 255, 255, 0.95);
+  color: #333;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  transition: all 0.2s;
+}
+.ctrl-btn:hover {
+  background: #f0f0f0;
+}
+.ctrl-btn.del-btn {
+  background: rgba(239, 68, 68, 0.9);
+  color: white;
+  border-color: transparent;
+  font-weight: bold;
+}
+.ctrl-btn.del-btn:hover {
+  background: #ef4444;
+}
+.drag-hover {
+  outline: 2px dashed #00d2ff !important;
+  outline-offset: -4px !important;
+  background: rgba(0, 210, 255, 0.05) !important;
+}
+
+/* ═══════════════ FIXED SIDEBAR ═══════════════ */
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: 60px;
+  width: 280px;
+  height: calc(100vh - 60px);
+  background: rgba(15, 17, 23, 0.95);
+  border-right: 1px solid rgba(0, 210, 255, 0.15);
+  z-index: 998;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  backdrop-filter: blur(12px);
+  box-shadow: 4px 0 12px rgba(0, 0, 0, 0.3);
+}
+
+.sidebar-header {
+  padding: 16px;
+  border-bottom: 1px solid rgba(0, 210, 255, 0.15);
+  flex-shrink: 0;
+}
+
+.sidebar-title {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #00d2ff;
+  margin-bottom: 12px;
+}
+
+.sidebar-search {
+  position: relative;
+}
+
+.sidebar-search input {
+  width: 100%;
+  padding: 8px 12px 8px 32px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(0, 210, 255, 0.2);
+  border-radius: 6px;
+  color: #e2e8f0;
+  font-size: 12px;
+  font-family: 'Inter', sans-serif;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.sidebar-search input:focus {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: #00d2ff;
+  box-shadow: 0 0 0 2px rgba(0, 210, 255, 0.1);
+}
+
+.sidebar-search::before {
+  content: '🔍';
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 12px;
+  pointer-events: none;
+}
+
+.sidebar-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sidebar-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar-content::-webkit-scrollbar-thumb {
+  background: rgba(0, 210, 255, 0.3);
+  border-radius: 3px;
+}
+
+.sidebar-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 210, 255, 0.5);
+}
+
+.sidebar-item {
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(0, 210, 255, 0.15);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  color: #cbd5e0;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  overflow: hidden;
+}
+
+.sidebar-item:hover {
+  background: rgba(0, 210, 255, 0.1);
+  border-color: rgba(0, 210, 255, 0.3);
+  color: #fff;
+}
+
+.sidebar-item.active {
+  background: rgba(0, 210, 255, 0.15);
+  border-color: #00d2ff;
+  color: #fff;
+}
+
+.sidebar-item-title {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar-item-page {
+  font-size: 10px;
+  color: #a0aec0;
+  background: rgba(0, 210, 255, 0.1);
+  padding: 2px 6px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.sidebar-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100px;
+  color: #718096;
+  font-size: 12px;
+  text-align: center;
+  padding: 12px;
+}
+
+.sidebar-toggle-btn {
+  position: fixed;
+  left: 0;
+  top: 60px;
+  width: 40px;
+  height: 40px;
+  background: rgba(0, 210, 255, 0.1);
+  border: 1px solid rgba(0, 210, 255, 0.2);
+  border-left: none;
+  border-radius: 0 6px 6px 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #00d2ff;
+  font-size: 18px;
+  z-index: 997;
+  transition: all 0.2s;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.sidebar-toggle-btn:hover {
+  background: rgba(0, 210, 255, 0.2);
+}
+
+.sidebar-toggle-btn.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.pdf-pages.sidebar-open {
+  margin-left: 280px;
+}
+.pdf-pages.components-sidebar-open {
+  margin-right: 300px;
+}
+
+@media (max-width: 1200px) {
+  .sidebar {
+    width: 240px;
+  }
+  .components-sidebar {
+    width: 260px;
+  }
+  .pdf-pages.sidebar-open {
+    margin-left: 240px;
+  }
+  .pdf-pages.components-sidebar-open {
+    margin-right: 260px;
+  }
+  .sidebar-item {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100%;
+    left: -100%;
+    transition: left 0.3s ease;
+  }
+  .sidebar.open {
+    left: 0;
+  }
+  .pdf-pages.sidebar-open {
+    margin-left: 0;
+  }
+  .sidebar-toggle-btn.show {
+    opacity: 1;
+  }
+}
+
+/* ═══════════════ COMPONENTS SIDEBAR (KANAN) ═══════════════ */
+.components-sidebar {
+  position: fixed;
+  right: 0;
+  top: 60px;
+  width: 300px;
+  height: calc(100vh - 60px);
+  background: rgba(15,17,23,0.98);
+  border-left: 1px solid rgba(0,210,255,0.12);
+  z-index: 998;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  backdrop-filter: blur(12px);
+  box-shadow: -4px 0 12px rgba(0,0,0,0.3);
+  transform: translateX(100%);
+  transition: transform 0.25s ease;
+}
+.components-sidebar.open { transform: translateX(0); }
+.components-sidebar .components-header { padding: 14px 12px 12px 14px; border-bottom: 1px solid rgba(0,210,255,0.08); color: #00d2ff; font-weight:700; text-transform:uppercase; letter-spacing:1px; display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.components-sidebar .components-header span { display:inline-block; font-size:12px; }
+.components-sidebar .components-close-btn { background: transparent; border: 1px solid rgba(255,255,255,0.18); color: #e2e8f0; width: 32px; height: 32px; border-radius: 8px; cursor: pointer; font-size: 18px; line-height: 1; display:flex; align-items:center; justify-content:center; transition: all 0.2s; }
+.components-sidebar .components-close-btn:hover { background: rgba(255,255,255,0.08); border-color: rgba(0,210,255,0.3); }
+.components-sidebar .components-body { padding: 12px; overflow-y: auto; display:flex; flex-direction:column; gap:8px; }
+.components-sidebar .component-item { padding:10px 12px; background: rgba(255,255,255,0.02); border:1px solid rgba(0,210,255,0.06); border-radius:8px; color:#e2e8f0; cursor:grab; display:flex; gap:8px; align-items:center; }
+.components-sidebar .component-item:hover { background: rgba(0,210,255,0.06); border-color: rgba(0,210,255,0.18); }
+
+@media (max-width: 992px) {
+  .components-sidebar { width: 260px; }
+}
+
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <div class="toolbar-brand">
+    <div class="dot"></div>
+    <span>Commandr Signa PhoneBank</span>
+  </div>
+  <div class="toolbar-actions">
+    <div class="color-picker-dropdown">
+      <button type="button" class="btn btn-color" id="colorBtn" onclick="toggleColorDropdown(event)">
+        <span class="color-preview" id="colorPreview" style="background: linear-gradient(145deg, #0a0e1a 0%, #091b24 40%, #0a1f2e 100%);"></span>
+        Warna Cover
+      </button>
+      <div class="color-dropdown-menu" id="colorMenu">
+        <div class="color-option active" data-color="linear-gradient(145deg, #0a0e1a 0%, #091b24 40%, #0a1f2e 100%)" data-hex="#0a0e1a" data-name="default" onclick="selectColor(this)">
+          <span class="color-preview" style="background: linear-gradient(145deg, #0a0e1a, #0a1f2e);"></span>
+          Default Dark
+        </div>
+        <div class="color-option" data-color="linear-gradient(145deg, #1b1429 0%, #110c1c 45%, #2c1e40 100%)" data-hex="#1b1429" data-name="purple" onclick="selectColor(this)">
+          <span class="color-preview" style="background: linear-gradient(145deg, #1b1429, #2c1e40);"></span>
+          Midnight Purple
+        </div>
+        <div class="color-option" data-color="linear-gradient(145deg, #082116 0%, #05140e 45%, #0e3d28 100%)" data-hex="#082116" data-name="green" onclick="selectColor(this)">
+          <span class="color-preview" style="background: linear-gradient(145deg, #082116, #0e3d28);"></span>
+          Forest Green
+        </div>
+        <div class="color-option" data-color="linear-gradient(145deg, #2b1706 0%, #1b0e03 45%, #42230a 100%)" data-hex="#2b1706" data-name="amber" onclick="selectColor(this)">
+          <span class="color-preview" style="background: linear-gradient(145deg, #2b1706, #42230a);"></span>
+          Sunset Amber
+        </div>
+        <div class="color-option" data-color="linear-gradient(145deg, #1f242e 0%, #131720 45%, #303746 100%)" data-hex="#1f242e" data-name="slate" onclick="selectColor(this)">
+          <span class="color-preview" style="background: linear-gradient(145deg, #1f242e, #303746);"></span>
+          Steel Slate
+        </div>
+        <div class="color-option custom-color-option" data-name="custom" onclick="triggerCustomColorInput(event)">
+          <input type="color" id="customColorInput" value="#0a0e1a" oninput="applyCustomColor(this.value)" onclick="event.stopPropagation()">
+          <span>Kustom...</span>
+        </div>
+        <div class="custom-gradient-panel" id="customGradientPanel">
+          <div class="custom-gradient-row">
+            <label for="customGradientStart">Warna 1</label>
+            <div class="custom-gradient-controls">
+              <input type="color" id="customGradientStart" value="#0a0e1a" oninput="applyCustomGradient()">
+              <input type="color" id="customGradientEnd" value="#0a1f2e" oninput="applyCustomGradient()">
+            </div>
+          </div>
+          <div class="custom-gradient-row">
+            <label for="customGradientAngle">Arah (deg)</label>
+            <div class="custom-gradient-controls">
+              <input type="range" id="customGradientAngle" min="0" max="360" value="145" oninput="applyCustomGradient()">
+              <span id="customGradientAngleVal" style="min-width:30px;text-align:center;color:#cbd5e1;">145°</span>
+            </div>
+          </div>
+          <div class="custom-gradient-row">
+            <label>Radius Sudut</label>
+            <div class="custom-gradient-controls">
+              <input type="number" id="cornerTL" class="corner-input" min="0" max="200" value="0" oninput="applyCornerRadius()" title="Top Left"> 
+              <input type="number" id="cornerTR" class="corner-input" min="0" max="200" value="0" oninput="applyCornerRadius()" title="Top Right"> 
+              <input type="number" id="cornerBR" class="corner-input" min="0" max="200" value="0" oninput="applyCornerRadius()" title="Bottom Right"> 
+              <input type="number" id="cornerBL" class="corner-input" min="0" max="200" value="0" oninput="applyCornerRadius()" title="Bottom Left"> 
+            </div>
+          </div>
+        </div>
+        <div class="cover-style-panel" id="coverStylePanel">
+          <div class="style-section-label">Style Cover</div>
+          <div class="style-toggle-row">
+            <label><input type="checkbox" id="glowBulatanToggle" onchange="toggleCoverGlow(this.checked)" checked>Glow Bulatan</label>
+          </div>
+          <div class="style-toggle-row">
+            <!-- Buletan and Grid controls removed -->
+          </div>
+          <div class="style-slider-row">
+            <label>Ukuran Glow</label>
+            <input type="range" id="coverGlowSize" min="80" max="240" value="140" oninput="updateGlowSize(this.value)">
+            <span class="range-value" id="coverGlowSizeLabel">140px</span>
+          </div>
+          <div class="custom-gradient-row">
+            <label>Warna Glow</label>
+            <div class="custom-gradient-controls">
+              <input type="color" id="coverGlowColor" value="#00d2ff" onchange="updateGlowColors()">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <button class="btn btn-pdf" id="dlBtn" onclick="downloadPDF()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Download PDF
+    </button>
+    <button class="btn btn-reset" id="resetBtn" onclick="resetAllEdits()" style="margin-left: 8px;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+      Reset Teks
+    </button>
+
+    <!-- Hamburger Menu (toggle opens right components sidebar) -->
+    <div class="hamburger-dropdown" style="position: relative; margin-left: 8px;">
+      <button class="btn btn-hamburger" id="hamburgerBtn" onclick="toggleHamburgerMenu(event)" style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(0, 210, 255, 0.25); color: #e2e8f0; padding: 8px; border-radius: 8px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+    </div>
+  </div>
+
+<script>
+function toggleHamburgerMenu(e) {
+  e.stopPropagation();
+  const sidebar = document.getElementById('componentsSidebar');
+  const pdfPages = document.getElementById('pdfPages');
+  if (!sidebar || !pdfPages) return;
+  sidebar.classList.toggle('open');
+  pdfPages.classList.toggle('components-sidebar-open');
+}
+
+function hideComponentsSidebar(event) {
+  event.stopPropagation();
+  const sidebar = document.getElementById('componentsSidebar');
+  const pdfPages = document.getElementById('pdfPages');
+  if (!sidebar || !pdfPages) return;
+  sidebar.classList.remove('open');
+  pdfPages.classList.remove('components-sidebar-open');
+}
+
+function handleComponentDragStart(e, type) {
+  e.dataTransfer.effectAllowed = 'copyMove';
+  e.dataTransfer.setData('text/plain', type);
+  e.dataTransfer.setData('Text', type);
+  e.dataTransfer.setData('text/html', type);
+  e.dataTransfer.setData('component-type', type);
+  e.dataTransfer.setData('application/x-component', type);
+  // Add a small delay so the element being dragged isn't visually modified while dragging
+  setTimeout(() => {
+    const cs = document.getElementById('componentsSidebar');
+    if (cs) cs.classList.remove('open');
+  }, 10);
+}
+
+window.alignElement = function(event, align) {
+  event.stopPropagation();
+  const wrapper = event.target.closest('.deletable');
+  if (!wrapper) return;
+  
+  // Set text alignment for the wrapper
+  wrapper.style.textAlign = align;
+  
+  // Handle specific children like images
+  const children = Array.from(wrapper.children);
+  children.forEach(child => {
+    if (child.classList.contains('img-large')) {
+      if (align === 'center') {
+        child.style.margin = '0 auto';
+      } else if (align === 'right') {
+        child.style.marginLeft = 'auto';
+        child.style.marginRight = '0';
+      } else {
+        child.style.marginLeft = '0';
+        child.style.marginRight = 'auto';
+      }
+    }
+  });
+
+  // Handle flex wrappers like step items
+  if (wrapper.tagName === 'LI' || window.getComputedStyle(wrapper).display === 'flex') {
+    wrapper.style.justifyContent = align === 'left' ? 'flex-start' : (align === 'right' ? 'flex-end' : 'center');
+  }
+};
+
+window.setFloat = function(event, floatVal) {
+  event.stopPropagation();
+  const wrapper = event.target.closest('.deletable');
+  if (!wrapper) return;
+  
+  wrapper.style.float = floatVal;
+  if (floatVal === 'left') {
+    wrapper.style.margin = '4px 16px 16px 0';
+    wrapper.style.display = 'block';
+  } else if (floatVal === 'right') {
+    wrapper.style.margin = '4px 0 16px 16px';
+    wrapper.style.display = 'block';
+  } else {
+    wrapper.style.margin = '16px 0';
+    wrapper.style.float = 'none';
+    wrapper.style.display = 'block';
+  }
+};
+
+const controlsHTML = `
+  <div class="element-controls">
+    <button class="ctrl-btn" onclick="alignElement(event, 'left')" title="Rata Kiri">⇤</button>
+    <button class="ctrl-btn" onclick="alignElement(event, 'center')" title="Rata Tengah">⇹</button>
+    <button class="ctrl-btn" onclick="alignElement(event, 'right')" title="Rata Kanan">⇥</button>
+    <button class="ctrl-btn del-btn" onclick="event.stopPropagation(); this.closest('.deletable').remove()" title="Hapus">×</button>
+  </div>
+`;
+
+const mediaControlsHTML = `
+  <div class="element-controls">
+    <button class="ctrl-btn del-btn" onclick="event.stopPropagation(); resetImagePlaceholder(this.closest('.deletable').querySelector('.img-placeholder'))" title="Hapus">×</button>
+  </div>
+`;
+
+const smallImageControlsHTML = `
+  <div class="element-controls">
+    <button class="ctrl-btn del-btn" onclick="event.stopPropagation(); resetImagePlaceholder(this.closest('.deletable').querySelector('.img-placeholder.img-small'))" title="Hapus">×</button>
+  </div>
+`;
+
+function adjustSmallImageSize(event, deltaW, deltaH) {
+  event.stopPropagation();
+  const wrapper = event.target.closest('.deletable');
+  if (!wrapper) return;
+  const placeholder = wrapper.querySelector('.img-placeholder.img-small');
+  if (!placeholder) return;
+  const currentWidth = parseInt(placeholder.style.width) || placeholder.offsetWidth;
+  const currentHeight = parseInt(placeholder.style.height) || placeholder.offsetHeight;
+  const newWidth = Math.max(40, currentWidth + deltaW);
+  const newHeight = Math.max(30, currentHeight + deltaH);
+  placeholder.style.width = newWidth + 'px';
+  placeholder.style.height = newHeight + 'px';
+}
+
+function customizeSmallImageSize(event) {
+  event.stopPropagation();
+  const wrapper = event.target.closest('.deletable');
+  if (!wrapper) return;
+  const placeholder = wrapper.querySelector('.img-placeholder.img-small');
+  if (!placeholder) return;
+  const currentWidth = parseInt(placeholder.style.width) || placeholder.offsetWidth;
+  const currentHeight = parseInt(placeholder.style.height) || placeholder.offsetHeight;
+  const width = prompt('Lebar (px)', currentWidth);
+  if (width === null) return;
+  const height = prompt('Tinggi (px)', currentHeight);
+  if (height === null) return;
+  const w = parseInt(width, 10);
+  const h = parseInt(height, 10);
+  if (!isNaN(w) && w > 0) placeholder.style.width = w + 'px';
+  if (!isNaN(h) && h > 0) placeholder.style.height = h + 'px';
+}
+
+function handleColumnDragOver(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  const col = e.target.closest('.two-columns-layout .col');
+  if (!col) return;
+  col.classList.add('drag-hover');
+}
+
+function handleColumnDragLeave(e) {
+  const col = e.target.closest('.two-columns-layout .col');
+  if (!col) return;
+  col.classList.remove('drag-hover');
+}
+
+function handleColumnDrop(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  const col = e.target.closest('.two-columns-layout .col');
+  if (!col) return;
+  col.classList.remove('drag-hover');
+  const type = e.dataTransfer.getData('text/plain') || e.dataTransfer.getData('component-type');
+  if (!type || type === 'two-columns-layout') return;
+
+  const newElement = createDroppedElement(type);
+  if (!newElement) return;
+
+  const content = col.querySelector('.col-content') || col;
+  content.appendChild(newElement);
+  col.classList.add('has-content');
+}
+
+function createDroppedElement(type) {
+  let element = null;
+  if (type === 'image') {
+    element = document.createElement('div');
+    element.className = 'deletable';
+    element.style.display = 'block';
+    element.style.marginBottom = '16px';
+    element.innerHTML = `
+      <div class="img-placeholder img-large" onclick="triggerUpload(this)">
+        <input type="file" accept="image/*" multiple onchange="previewImg(event,this.parentElement)" onclick="event.stopPropagation()"/>
+        <div style="text-align:center;pointer-events:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)">
+          <div style="font-size:32px;margin-bottom:8px">🖼️</div>
+          <div class="ph-label">Gambar Baru <span class="body-cite"></span></div>
+          <div class="ph-sub" style="margin-top:4px">Klik untuk upload gambar</div>
+        </div>
+      </div>
+      ${mediaControlsHTML}
+    `;
+  } else if (type === 'text') {
+    element = document.createElement('div');
+    element.className = 'deletable';
+    element.style.position = 'relative';
+    element.style.marginBottom = '16px';
+    element.innerHTML = `
+      <p class="body-text editable-text" onclick="makeEditable(this)" style="margin-bottom:0;">Teks paragraf baru. Klik untuk mengedit isi teks ini. <span class="body-cite"></span></p>
+      ${controlsHTML}
+    `;
+  } else if (type === 'step') {
+    element = document.createElement('li');
+    element.className = 'step-item deletable';
+    element.innerHTML = `
+      <div class="step-text editable-text" onclick="makeEditable(this)">Teks langkah baru <span class="body-cite"></span></div>
+      ${controlsHTML}
+    `;
+  } else if (type === 'step-icon-right') {
+    element = document.createElement('li');
+    element.className = 'step-item deletable';
+    element.innerHTML = `
+      <div class="step-text">
+        <span class="editable-text" onclick="makeEditable(this)" style="cursor:pointer;">Klik icon</span>
+        <span class="body-cite"></span>
+        <div class="img-placeholder img-icon" style="width: 100px; height: 35px; display:inline-block; vertical-align:middle; margin:0 4px;" onclick="triggerUpload(this)">
+          <input type="file" accept="image/*" onchange="previewImg(event,this.parentElement)" onclick="event.stopPropagation()"/>
+        </div>
+      </div>
+      ${controlsHTML}
+    `;
+  } else if (type === 'step-icon-mid') {
+    element = document.createElement('li');
+    element.className = 'step-item deletable';
+    element.innerHTML = `
+      <div class="step-text">
+        <span class="editable-text" onclick="makeEditable(this)" style="cursor:pointer;">Klik icon</span>
+        <span class="body-cite"></span>
+        <div class="img-placeholder img-icon" style="width: 50px; height: 40px; display:inline-block; vertical-align:middle; margin:0 4px;" onclick="triggerUpload(this)">
+          <input type="file" accept="image/*" onchange="previewImg(event,this.parentElement)" onclick="event.stopPropagation()"/>
+        </div>
+        <span class="editable-text" onclick="makeEditable(this)" style="cursor:pointer;">pada menu</span>
+        <span class="body-cite"></span>
+      </div>
+      ${controlsHTML}
+    `;
+  } else if (type === 'step-icon-bottom') {
+    element = document.createElement('li');
+    element.className = 'step-item deletable';
+    element.innerHTML = `
+      <div class="step-text">
+        <span class="editable-text" onclick="makeEditable(this)" style="cursor:pointer;">Setelah memilih, pada bagian paling atas klik icon</span>
+        <span class="body-cite"></span>
+        <div class="img-placeholder img-icon" style="width: 120px; height: 35px; display:block; margin-top: 6px;" onclick="triggerUpload(this)">
+          <input type="file" accept="image/*" onchange="previewImg(event,this.parentElement)" onclick="event.stopPropagation()"/>
+        </div>
+      </div>
+      ${controlsHTML}
+    `;
+  } else if (type === 'image-small') {
+    element = document.createElement('div');
+    element.className = 'deletable';
+    element.style.display = 'block';
+    element.style.marginBottom = '16px';
+    element.innerHTML = `
+      <div class="img-placeholder img-small" onclick="triggerUpload(this)">
+        <input type="file" accept="image/*" onchange="previewImg(event,this.parentElement)" onclick="event.stopPropagation()"/>
+        <div style="text-align:center;pointer-events:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)">
+          <div style="font-size:24px;margin-bottom:6px">🖼️</div>
+          <div class="ph-label">Small Image</div>
+          <div class="ph-sub" style="margin-top:4px">Klik untuk upload gambar kecil</div>
+        </div>
+      </div>
+      ${mediaControlsHTML}
+    `;
+  } else if (type === 'bold-text') {
+    element = document.createElement('div');
+    element.className = 'deletable';
+    element.style.position = 'relative';
+    element.style.marginBottom = '16px';
+    element.innerHTML = `
+      <strong class="body-text editable-text" onclick="makeEditable(this)" style="display:block; margin-bottom:0;">Teks tebal baru. Klik untuk mengedit isi teks ini. <span class="body-cite"></span></strong>
+      ${controlsHTML}
+    `;
+  } else if (type === 'paragraph') {
+    element = document.createElement('div');
+    element.className = 'deletable';
+    element.style.position = 'relative';
+    element.style.marginBottom = '16px';
+    element.innerHTML = `
+      <p class="body-text editable-text" onclick="makeEditable(this)" style="margin-bottom:0;">Teks paragraf baru. Klik untuk mengedit isi teks ini. <span class="body-cite"></span></p>
+      ${controlsHTML}
+    `;
+  }
+
+  return element;
+}
+
+// Universal drag events using delegation
+document.addEventListener('dragover', function(e) {
+  const container = e.target.closest('.page, .col2, .feature-grid, .feature-card, .info-box, .steps-list, .two-columns-layout, .two-columns-layout .col, td, .deletable, .editable-text, .body-text, .step-text');
+  const types = Array.from(e.dataTransfer.types || []);
+  const canAccept = types.includes('component-type') || types.includes('text/plain') || types.includes('Text') || types.includes('text/html') || types.includes('application/x-component') || types.includes('Files');
+  if (container && canAccept) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'copy';
+    document.querySelectorAll('.drag-hover').forEach(el => el.classList.remove('drag-hover'));
+    container.classList.add('drag-hover');
+  }
+});
+
+document.addEventListener('dragleave', function(e) {
+  if (e.target.classList && e.target.classList.contains('drag-hover')) {
+    e.target.classList.remove('drag-hover');
+  }
+});
+
+document.addEventListener('drop', function(e) {
+  const layout = e.target.closest('.two-columns-layout');
+  if (layout && !e.target.closest('.two-columns-layout .col')) {
+    const leftCol = layout.querySelector('.col');
+    if (leftCol) {
+      handleColumnDrop({ ...e, target: leftCol, preventDefault: () => e.preventDefault(), stopPropagation: () => e.stopPropagation() });
+      return;
+    }
+  }
+
+  const container = e.target.closest('.page, .col2, .feature-grid, .feature-card, .info-box, .steps-list, .two-columns-layout .col, td, .deletable, .editable-text, .body-text, .step-text');
+  document.querySelectorAll('.drag-hover').forEach(el => el.classList.remove('drag-hover'));
+  
+  if (container) {
+    const type = e.dataTransfer.getData('text/plain') || e.dataTransfer.getData('component-type') || e.dataTransfer.getData('component') || e.dataTransfer.getData('type');
+    if (type && ['image', 'image-small', 'icon', 'text', 'step', 'step-icon-right', 'step-icon-mid', 'step-icon-bottom', 'two-columns-layout', 'bold-text', 'paragraph'].includes(type)) {
+      e.preventDefault();
+      
+      const isTextContainer = container.classList.contains('editable-text') || container.classList.contains('body-text') || container.classList.contains('step-text');
+      let newElement = null;
+      if (type === 'image') {
+        newElement = document.createElement('div');
+        newElement.className = 'deletable';
+        newElement.style.display = 'block';
+        newElement.style.marginBottom = '16px';
+        newElement.innerHTML = `
+          <div class="img-placeholder img-large" onclick="triggerUpload(this)">
+            <input type="file" accept="image/*" multiple onchange="previewImg(event,this.parentElement)" onclick="event.stopPropagation()"/>
+            <div style="text-align:center;pointer-events:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)">
+              <div style="font-size:32px;margin-bottom:8px">🖼️</div>
+              <div class="ph-label">Gambar Baru <span class="body-cite"></span></div>
+              <div class="ph-sub" style="margin-top:4px">Klik untuk upload gambar</div>
+            </div>
+          </div>
+          ${mediaControlsHTML}
+        `;
+      } else if (type === 'text') {
+        newElement = document.createElement('div');
+        newElement.className = 'deletable';
+        newElement.style.position = 'relative';
+        newElement.style.marginBottom = '16px';
+        newElement.innerHTML = `
+          <p class="body-text editable-text" onclick="makeEditable(this)" style="margin-bottom:0;">Teks paragraf baru. Klik untuk mengedit isi teks ini. <span class="body-cite"></span></p>
+          ${controlsHTML}
+        `;
+      } else if (type === 'step') {
+        newElement = document.createElement('li');
+        newElement.className = 'step-item deletable';
+        newElement.innerHTML = `
+          <div class="step-text editable-text" onclick="makeEditable(this)">Teks langkah baru <span class="body-cite"></span></div>
+          ${controlsHTML}
+        `;
+        // If container is not a list, wrap in ul
+        if (container.tagName !== 'UL' && container.tagName !== 'OL' && !container.classList.contains('steps-list')) {
+          const listWrap = document.createElement('ul');
+          listWrap.className = 'steps-list';
+          listWrap.appendChild(newElement);
+          newElement = listWrap;
+        }
+
+      } else if (type === 'step-icon-right') {
+        // Step item dengan icon placeholder di akhir kalimat
+        newElement = document.createElement('li');
+        newElement.className = 'step-item deletable';
+        newElement.innerHTML = `
+          <div class="step-text">
+            <span class="editable-text" onclick="makeEditable(this)" style="cursor:pointer;">Klik icon</span>
+            <span class="body-cite"></span>
+            <div class="img-placeholder img-icon" style="width: 100px; height: 35px; display:inline-block; vertical-align:middle; margin:0 4px;" onclick="triggerUpload(this)">
+              <input type="file" accept="image/*" onchange="previewImg(event,this.parentElement)" onclick="event.stopPropagation()"/>
+            </div>
+          </div>
+          ${controlsHTML}
+        `;
+        if (container.tagName !== 'UL' && container.tagName !== 'OL' && !container.classList.contains('steps-list')) {
+          const listWrap = document.createElement('ul');
+          listWrap.className = 'steps-list';
+          listWrap.appendChild(newElement);
+          newElement = listWrap;
+        }
+
+      } else if (type === 'step-icon-mid') {
+        // Step item dengan icon placeholder di tengah kalimat
+        newElement = document.createElement('li');
+        newElement.className = 'step-item deletable';
+        newElement.innerHTML = `
+          <div class="step-text">
+            <span class="editable-text" onclick="makeEditable(this)" style="cursor:pointer;">Klik icon</span>
+            <span class="body-cite"></span>
+            <div class="img-placeholder img-icon" style="width: 50px; height: 40px; display:inline-block; vertical-align:middle; margin:0 4px;" onclick="triggerUpload(this)">
+              <input type="file" accept="image/*" onchange="previewImg(event,this.parentElement)" onclick="event.stopPropagation()"/>
+            </div>
+            <span class="editable-text" onclick="makeEditable(this)" style="cursor:pointer;">pada menu</span>
+            <span class="body-cite"></span>
+          </div>
+          ${controlsHTML}
+        `;
+        if (container.tagName !== 'UL' && container.tagName !== 'OL' && !container.classList.contains('steps-list')) {
+          const listWrap = document.createElement('ul');
+          listWrap.className = 'steps-list';
+          listWrap.appendChild(newElement);
+          newElement = listWrap;
+        }
+
+      } else if (type === 'step-icon-bottom') {
+        // Step item dengan icon placeholder di bawah teks
+        newElement = document.createElement('li');
+        newElement.className = 'step-item deletable';
+        newElement.innerHTML = `
+          <div class="step-text">
+            <span class="editable-text" onclick="makeEditable(this)" style="cursor:pointer;">Setelah memilih, pada bagian paling atas klik icon</span>
+            <span class="body-cite"></span>
+            <div class="img-placeholder img-icon" style="width: 120px; height: 35px; display:block; margin-top: 6px;" onclick="triggerUpload(this)">
+              <input type="file" accept="image/*" onchange="previewImg(event,this.parentElement)" onclick="event.stopPropagation()"/>
+            </div>
+          </div>
+          ${controlsHTML}
+        `;
+        if (container.tagName !== 'UL' && container.tagName !== 'OL' && !container.classList.contains('steps-list')) {
+          const listWrap = document.createElement('ul');
+          listWrap.className = 'steps-list';
+          listWrap.appendChild(newElement);
+          newElement = listWrap;
+        }
+
+      } else if (type === 'image-small') {
+        newElement = document.createElement('div');
+        newElement.className = 'deletable';
+        newElement.style.display = 'block';
+        newElement.style.marginBottom = '16px';
+        newElement.innerHTML = `
+          <div class="img-placeholder img-small" style="width:160px; height:120px;" onclick="triggerUpload(this)">
+            <input type="file" accept="image/*" onchange="previewImg(event,this.parentElement)" onclick="event.stopPropagation()"/>
+            <div style="text-align:center;pointer-events:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)">
+              <div style="font-size:24px;margin-bottom:6px">🖼️</div>
+              <div class="ph-label">Small Image</div>
+              <div class="ph-sub" style="margin-top:4px">Klik untuk upload gambar kecil</div>
+            </div>
+          </div>
+          ${smallImageControlsHTML}
+        `;
+      } else if (type === 'two-columns-layout') {
+        // Two columns layout container
+        newElement = document.createElement('div');
+        newElement.className = 'two-columns-layout-wrapper deletable';
+        newElement.innerHTML = `
+          <div class="two-columns-layout">
+            <div class="col" ondrop="handleColumnDrop(event)" ondragover="handleColumnDragOver(event)" ondragleave="handleColumnDragLeave(event)" style="position:relative;">
+              <div class="column-placeholder">Drop di sini untuk kiri</div>
+              <div class="col-content"></div>
+            </div>
+            <div class="col" ondrop="handleColumnDrop(event)" ondragover="handleColumnDragOver(event)" ondragleave="handleColumnDragLeave(event)" style="position:relative;">
+              <div class="column-placeholder">Drop di sini untuk kanan</div>
+              <div class="col-content"></div>
+            </div>
+          </div>
+          <div class="layout-toolbar">
+            <button class="ctrl-btn del-btn" onclick="event.stopPropagation(); this.closest('.deletable').remove()" title="Hapus">×</button>
+          </div>
+        `;
+      } else if (type === 'bold-text') {
+        // Bold text component
+        newElement = document.createElement('div');
+        newElement.className = 'deletable';
+        newElement.style.display = 'block';
+        newElement.style.marginBottom = '16px';
+        newElement.innerHTML = `
+          <strong class="body-text editable-text" onclick="makeEditable(this)" style="margin-bottom:0; display: block;">Teks tebal baru. Klik untuk mengedit isi teks ini. <span class="body-cite"></span></strong>
+          ${controlsHTML}
+        `;
+      } else if (type === 'paragraph') {
+        // Paragraph text component
+        newElement = document.createElement('div');
+        newElement.className = 'deletable';
+        newElement.style.position = 'relative';
+        newElement.style.marginBottom = '16px';
+        newElement.innerHTML = `
+          <p class="body-text editable-text" onclick="makeEditable(this)" style="margin-bottom:0;">Teks paragraf baru. Klik untuk mengedit isi teks ini. <span class="body-cite"></span></p>
+          ${controlsHTML}
+        `;
+      }
+      
+      if (newElement) {
+        if (isTextContainer && (type === 'icon' || type === 'image')) {
+          // Drop inline at exact cursor position
+          let range = null;
+          if (document.caretRangeFromPoint) {
+            range = document.caretRangeFromPoint(e.clientX, e.clientY);
+          } else if (e.rangeParent) {
+            range = document.createRange();
+            range.setStart(e.rangeParent, e.rangeOffset);
+          }
+          
+          if (range) {
+            range.insertNode(newElement);
+          } else {
+            container.appendChild(newElement);
+          }
+        } else {
+          insertAtDropPosition(container, e, newElement);
+        }
+      }
+    }
+  }
+});
+
+function insertAtDropPosition(container, e, element) {
+  // Find closest element to insert relative to the drop position Y coordinate
+  const children = Array.from(container.children);
+  let closest = null;
+  let minDistance = Infinity;
+  
+  children.forEach(child => {
+    if (child.classList.contains('page-header') || child.classList.contains('page-footer') || child.style.position === 'absolute' || child.classList.contains('btn-delete-element')) return;
+    const rect = child.getBoundingClientRect();
+    const distance = Math.abs(rect.top + rect.height / 2 - e.clientY);
+    if (distance < minDistance) {
+      minDistance = distance;
+      closest = child;
+    }
+  });
+
+  if (closest) {
+    const rect = closest.getBoundingClientRect();
+    if (e.clientY < rect.top + rect.height / 2) {
+      container.insertBefore(element, closest);
+    } else {
+      if (closest.nextSibling) {
+        container.insertBefore(element, closest.nextSibling);
+      } else {
+        container.appendChild(element);
+      }
+    }
+  } else {
+    // Fallback if empty container
+    const footer = container.querySelector('.page-footer');
+    if (footer) {
+      container.insertBefore(element, footer);
+    } else {
+      container.appendChild(element);
+    }
+  }
+}
+
+// Remove window.setupDropZones references
+window.setupDropZones = function() {};
+</script>
+</div>
+
+<!-- ═══════════════ FIXED SIDEBAR ═══════════════ -->
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-title">📋 Pencarian</div>
+    <div class="sidebar-search">
+      <input 
+        type="text" 
+        id="sidebarSearch" 
+        placeholder="Cari teks..." 
+        onkeyup="filterSidebarItems()"
+        style="padding-left: 32px;"
+      />
+    </div>
+  </div>
+  <div class="sidebar-content" id="sidebarContent">
+    <div class="sidebar-pages" id="sidebarPages"></div>
+    <div class="sidebar-search-results" id="sidebarSearchResults">
+      <div class="sidebar-empty">Mulai ketik untuk mencari...</div>
+    </div>
+  </div>
+</div>
+
+<button class="sidebar-toggle-btn" id="sidebarToggleBtn" onclick="toggleSidebar()" title="Buka Sidebar">☰</button>
+
+<!-- ═══════════════ COMPONENTS SIDEBAR (KANAN) ═══════════════ -->
+<div class="components-sidebar" id="componentsSidebar">
+  <div class="components-header">
+    <span>Komponen (Drag ke Kertas)</span>
+    <button class="components-close-btn" onclick="hideComponentsSidebar(event)" aria-label="Tutup Sidebar">×</button>
+  </div>
+  <div class="components-body">
+    <div class="component-item" draggable="true" ondragstart="handleComponentDragStart(event, 'image')">
+      <div style="color:#00d2ff; display:flex; align-items:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg></div>
+      <div style="font-size:12px; font-weight:500; color:#e2e8f0;">Image 4x</div>
+    </div>
+
+    <div class="component-item" draggable="true" ondragstart="handleComponentDragStart(event, 'image-small')">
+      <div style="color:#00d2ff; display:flex; align-items:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="12" rx="2" ry="2"></rect><circle cx="8.5" cy="10.5" r="1.5"></circle><polyline points="20 16 15 11 6 20"></polyline></svg></div>
+      <div style="font-size:12px; font-weight:500; color:#e2e8f0;">Small Image</div>
+    </div>
+
+    <div class="component-item" draggable="true" ondragstart="handleComponentDragStart(event, 'step-icon-right')">
+      <div style="color:#00d2ff;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="13" y2="6"></line><line x1="3" y1="12" x2="13" y2="12"></line><line x1="3" y1="18" x2="9" y2="18"></line><rect x="16" y="8" width="5" height="8" rx="1"></rect></svg></div>
+      <div style="font-size:12px; font-weight:500; color:#e2e8f0;">Step + Icon di Kanan</div>
+    </div>
+
+    <div class="component-item" draggable="true" ondragstart="handleComponentDragStart(event, 'step-icon-mid')">
+      <div style="color:#00d2ff;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="7" y2="12"></line><rect x="10" y="8" width="4" height="8" rx="1"></rect><line x1="17" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></div>
+      <div style="font-size:12px; font-weight:500; color:#e2e8f0;">Step + Icon di Tengah</div>
+    </div>
+
+    <div class="component-item" draggable="true" ondragstart="handleComponentDragStart(event, 'step-icon-bottom')">
+      <div style="color:#00d2ff;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="11" x2="15" y2="11"></line><rect x="3" y="16" width="12" height="5" rx="1"></rect></svg></div>
+      <div style="font-size:12px; font-weight:500; color:#e2e8f0;">Step + Icon di Bawah</div>
+    </div>
+
+    <div class="component-item" draggable="true" ondragstart="handleComponentDragStart(event, 'step')">
+      <div style="color:#00d2ff;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2" ry="2"></rect><line x1="7" y1="9" x2="17" y2="9"></line><line x1="7" y1="13" x2="17" y2="13"></line><circle cx="5" cy="9" r="0.5" fill="currentColor"></circle><circle cx="5" cy="13" r="0.5" fill="currentColor"></circle></svg></div>
+      <div style="font-size:12px; font-weight:500; color:#e2e8f0;">Drag Card / Step Item</div>
+    </div>
+
+    <div class="component-item" draggable="true" ondragstart="handleComponentDragStart(event, 'bold-text')">
+      <div style="color:#00d2ff;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h12M6 4v16M6 4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2M12 8H6M12 8h8a2 2 0 0 1 0 4H12M12 8v12"/></svg></div>
+      <div style="font-size:12px; font-weight:500; color:#e2e8f0;">Teks Tebal</div>
+    </div>
+
+    <div class="component-item" draggable="true" ondragstart="handleComponentDragStart(event, 'paragraph')">
+      <div style="color:#00d2ff;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line><line x1="3" y1="14" x2="21" y2="14"></line><line x1="3" y1="18" x2="15" y2="18"></line></svg></div>
+      <div style="font-size:12px; font-weight:500; color:#e2e8f0;">Teks Paragraf</div>
+    </div>
+
+    <div class="component-item" draggable="true" ondragstart="handleComponentDragStart(event, 'two-columns-layout')">
+      <div style="color:#00d2ff;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="12" y1="3" x2="12" y2="21"/></svg></div>
+      <div style="font-size:12px; font-weight:500; color:#e2e8f0;">Layout Kanan-Kiri</div>
+    </div>
+  </div>
+</div>
+
+<div class="pdf-pages" id="pdfPages">
+
+<!-- ═══════════════ PAGE 1: COVER ═══════════════ -->
+<div class="page page-cover cover-style-premium cover-glow-active" id="p1">
+  <div class="cover-gradient-layer" id="coverGradientLayer"></div>
+  <div class="cover-glow-ring cover-ring-1"></div>
+  <div class="cover-glow-ring cover-ring-2"></div>
+  <div>
+    <div class="cover-badge">
+      <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><circle cx="5" cy="5" r="5" fill="#00d2ff"/></svg>
+      Manual Book <span class="body-cite">[cite: 1]</span>
+    </div>
+  </div>
+  <div class="cover-main">
+    <div class="cover-eyebrow">Commandr Signa</div>
+    <div class="cover-title">PHONEBANK DASHBOARD APPLICATION <span class="body-cite"></span></div>
+    <div class="cover-divider"></div>
+  </div>
+  <div class="cover-footer">
+    <div class="cover-logo-text">Commandr Signa</div>
+    <div class="footer-page">01</div>
+  </div>
+</div>
+
+<!-- ═══════════════ PAGE 2: TOC (DAFTAR ISI) ═══════════════ -->
+<div class="page page-toc" id="p2">
+  <div class="toc-header">
+    <div class="section-label">Navigation</div>
+    <div class="toc-title">Daftar Isi</div>
+    <div class="toc-divider"></div>
+  </div>
+  <ul class="toc-list">
+    <li class="toc-item">
+      <div class="toc-num">1</div>
+      <div class="toc-name">Dashboard Overview</div>
+      <div class="toc-dot"></div>
+      <div class="toc-page">03</div>
+    </li>
+    <li class="toc-item">
+      <div class="toc-num">2</div>
+      <div class="toc-name">Transmission Data Acquisition</div>
+      <div class="toc-dot"></div>
+      <div class="toc-page">04</div>
+    </li>
+    <li class="toc-item">
+      <div class="toc-num">3</div>
+      <div class="toc-name">Intelligent Account Grazing</div>
+      <div class="toc-dot"></div>
+      <div class="toc-page">06</div>
+    </li>
+    <li class="toc-item">
+      <div class="toc-num">4</div>
+      <div class="toc-name">Ripe Account Management</div>
+      <div class="toc-dot"></div>
+      <div class="toc-page">09</div>
+    </li>
+    <li class="toc-item">
+      <div class="toc-num">5</div>
+      <div class="toc-name">AI-Text Optimization &amp; Farming Rule</div>
+      <div class="toc-dot"></div>
+      <div class="toc-page">11</div>
+    </li>
+    <li class="toc-item">
+      <div class="toc-num">6</div>
+      <div class="toc-name">Control Panel</div>
+      <div class="toc-dot"></div>
+      <div class="toc-page">13</div>
+    </li>
+  </ul>
+  <div class="page-footer">
+    <div class="footer-brand">Commandr Signa PhoneBank</div>
+    <div class="footer-page">02</div>
+  </div>
+</div>
+
+<!-- ═══════════════ PAGE 3: DASHBOARD ═══════════════ -->
+<div class="page page-content" id="p3">
+  <div class="page-header">
+    <div class="page-header-left">
+      <div class="chapter-num">1</div>
+      <div class="chapter-info">
+        <div class="chapter-label">Menu Utama</div>
+        <div class="chapter-name">Dashboard Overview</div>
+      </div>
+    </div>
+    <div class="page-num-tag">Halaman 03</div>
+  </div>
+
+  <div class="section-title">Dashboard <span class="body-cite"></span></div>
+  <div class="section-accent"></div>
+  
+  <div class="img-placeholder img-large" onclick="triggerUpload(this)">
+    <input type="file" accept="image/*" multiple onchange="previewImg(event,this.parentElement)" onclick="event.stopPropagation()"/>
+    <div style="text-align:center;pointer-events:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)">
+      <div style="font-size:32px;margin-bottom:8px">🖼️</div>
+      <div class="ph-label">Upload 4 Gambar <span class="body-cite"></span></div>
+      <div class="ph-sub" style="margin-top:4px">Klik untuk upload sampai 4 gambar, akan tampil 2x2 dengan keterangan di bawah setiap gambar</div>
+    </div>
+  </div>
+
+  <p class="body-text">Tampilan dashboard digunakan untuk melihat summary data akun dan terdapat nama devices yang terdaftar pada PhoneBank , Berikut keterangan data dari dashboard : <span class="body-cite"></span></p>
+
+  <ul class="steps-list">
+    <li class="step-item"><div class="step-text">Online Phones, menunjukan jumlah devices aktif dari total devices yang terdapat pada PhoneBank; <span class="body-cite"></span></div></li>
+    <li class="step-item"><div class="step-text">Prime Account, menunjukan jumlah akun yang akan di pilih untuk melakukan pengiriman pesan; <span class="body-cite"></span></div></li>
+    <li class="step-item"><div class="step-text">Whatsapp Registered, menunjukan total akun whatsapp yang aktif dari total akun whatsapp yang ada; <span class="body-cite"></span></div></li>
+  </ul>
+
+  <p class="body-text">Jumlah akun whatsapp juga akan di tampilkan pada masing-masing devices seperti gambar dibawah ini: <span class="body-cite"></span></p>
+
+  <div class="img-placeholder img-small" onclick="triggerUpload(this)">
+    <input type="file" accept="image/*" onchange="previewImg(event,this.parentElement)" onclick="event.stopPropagation()"/>
+    <div style="text-align:center;pointer-events:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)">
+      <div style="font-size:24px;margin-bottom:4px">🖼️</div>
+      <div class="ph-label">Gambar 1.2 <span class="body-cite"></span></div>
+    </div>
+  </div>
+
+  <div class="page-footer">
+      <div class="footer-brand">Commandr Signa PhoneBank</div>
+      <div class="footer-page">03 / 13</div>
+  </div>
+</div>
+
+<!-- ═══════════════ PAGE 4: TDAS Part 1 ═══════════════ -->
+<div class="page page-content" id="p4">
+  <div class="page-header">
+    <div class="page-header-left">
+      <div class="chapter-num">2</div>
+      <div class="chapter-info">
+        <div class="chapter-label">Menu System</div>
+        <div class="chapter-name">Transmission Data Acquisition</div>
+      </div>
+    </div>
+    <div class="page-num-tag">Halaman 04</div>
+  </div>
+
+  <div class="section-title">Transmission Data Acquisition System <span class="body-cite"></span></div>
+  <div class="section-accent"></div>
+
+  <div class="img-placeholder img-large" onclick="triggerUpload(this)">
+    <input type="file" accept="image/*" multiple onchange="previewImg(event,this.parentElement)" onclick="event.stopPropagation()"/>
+    <div style="text-align:center;pointer-events:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)">
+      <div style="font-size:32px;margin-bottom:8px">🖼️</div>
+      <div class="ph-label">Gambar 2.1 <span class="body-cite"></span></div>
+    </div>
+  </div>
+
+  <p class="body-text">Menu ini digunakan untuk melakukan registrasi akun whatsapp oleh sistem secara otomatis, berikut adalah langkah-langkah dalam melakukan registrasi akun : <span class="body-cite"></span></p>
+
+  <div class="body-subtitle">Whatsapp Registration <span class="body-cite"></span></div>
+  <ul class="steps-list">
+    <li class="step-item"><div class="step-text">Pilih device yang akan didaftarkan akunnya kemudian masukan kartu provider ke slot sim pada Phonebank, <span class="body-cite"></span>
+        <br>
+        <div class="img-placeholder img-icon" onclick="triggerUpload(this)">
+            <input type="file" accept="image/*" onchange="previewImg(event,this.parentElement)" onclick="event.stopPropagation()"/>
+            <div style="text-align:center;pointer-events:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)">
+                <span style="font-size:10px; color:#718096">Upload</span>
+            </div>
+        </div>
+    </div></li>
+    <li class="step-item"><div class="step-text">Setelah kartu dimasukan klik whatsapp registration untuk melakukan pendaftaran whatsapp secara otomatis oleh sistem. <span class="body-cite"></span></div></li>
+    <li class="step-item"><div class="step-text">Tunggu hingga registrasi selesai. <span class="body-cite"></span></div></li>
+    <li class="step-item"><div class="step-text">Setelah registrasi selesai akan muncul notifikasi “ Please change your sim card ” diatas nama devices yang telah diregistrasi akun. <span class="body-cite"></span></div></li>
+    <li class="step-item"><div class="step-text">Akun whatsapp yang telah berhasil terdaftar akan menunjukan jumlah akun whatsapp pada device bertambah. <span class="body-cite"></span></div></li>
+    <li class="step-item"><div class="step-text">Ganti dengan sim card yang baru dan registrasi lagi hingga mencapai batas maksimal akun yang diperlukan pada masing-masing devices . <span class="body-cite"></span></div></li>
+  </ul>
+
+  <div class="body-subtitle">Cancel All Registration <span class="body-cite"></span></div>
+  <div class="img-placeholder img-icon" onclick="triggerUpload(this)">
+    <input type="file" accept="image/*" onchange="previewImg(event,this.parentElement)" onclick="event.stopPropagation()"/>
+    <div style="text-align:center;pointer-events:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)">
+        <span style="font-size:10px; color:#718096">Upload</span>
+    </div>
+  </div>
+  
+  <p class="body-text">Digunakan untuk menghentikan registrasi yang sedang berjalan, berikut langkah-langkah melakukan pembatalan registrasi akun : <span class="body-cite"></span></p>
+  <ul class="steps-list">
+    <li class="step-item"><div class="step-text">Klik cancel all registration <span class="body-cite"></span></div></li>
+    <li class="step-item"><div class="step-text">Kemudian akan muncul alert “ Do you want to cancel all registration progress ? ” <span class="body-cite"></span></div></li>
+  </ul>
+
+  <div class="page-footer">
+      <div class="footer-brand">Commandr Signa PhoneBank</div>
+      <div class="footer-page">04 / 13</div>
+  </div>
+</div>
+
+<!-- ═══════════════ PAGE 5: TDAS Part 2 ═══════════════ -->
+<div class="page page-content" id="p5">
+    <div class="page-header">
+        <div class="page-header-left">
+            <div class="chapter-num">2</div>
+            <div class="chapter-info">
+                <div class="chapter-label">Lanjutan</div>
+                <div class="chapter-name">Transmission Data Acquisition</div>
+            </div>
+        </div>
+        <div class="page-num-tag">Halaman 05</div>
+    </div>
+
+    <div class="img-placeholder img-small" style="padding-top:25%;" onclick="triggerUpload(this)">
+        <input type="file" accept="image/*" onchange="previewImg(event,this.parentElement)" onclick="event.stopPropagation()"/>
+        <div style="text-align:center;pointer-events:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)">
+            <div style="font-size:24px;margin-bottom:4px">🖼️</div>
+            <div class="ph-label">Gambar 2.2 <span class="body-cite"></span></div>
+        </div>
+    </div>
+
+    <p class="body-text">Pilih “ yes ” untuk membatalkan register otomatis. <span class="body-cite"></span></p>
+
+    <div class="body-subtitle">Filter <span class="body-cite"></span></div>
+    <p class="body-text">Filter digunakan untuk melakukan pencarian pada menu propagation collection system berdasarkan kategori yang dipilih, berikut langkah-langkahnya : <span class="body-cite"></span></p>
+
+    <div class="img-placeholder img-medium" onclick="triggerUpload(this)">
+        <input type="file" accept="image/*" onchange="previewImg(event,this.parentElement)" onclick="event.stopPropagation()"/>
+        <div style="text-align:center;pointer-events:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)">
+            <div style="font-size:32px;margin-bottom:8px">🖼️</div>
+            <div class="ph-label">Gambar 2.3 <span class="body-cite"></span></div>
+        </div>
+    </div>
+
+    <div class="body-subtitle">Registered <span class="body-cite"></span></div>
+    <ul class="steps-list">
+        <li class="step-item"><div class="step-text">Klik icon filter <span class="body-cite"></span> 
+            <div class="img-placeholder img-icon" style="width: 80px; height: 35px;" onclick="triggerUpload(this)">
+                <input type="file" accept="image/*" onchange="previewImg(event,this.parentElement)" onclick="event.stopPropagation()"/>
+            </div>
+            di sebelah kiri atas pada menu Transmission Data Acquisition System. <span class="body-cite"></span>
+        </div></li>
+        <li class="step-item"><div class="step-text">Pada pilihan registered pilih kategori yang ingin dicari : <span class="body-cite"></span><br>
+            - No Whatsapp, akan menampilkan devices yang tidak terdapat akun whatsapp. <span class="body-cite"></span>
+        </div></li>
+        <li class="step-item"><div class="step-text">Klik icon Filter <span class="body-cite"></span>
+            <div class="img-placeholder img-icon" style="width: 80px; height: 35px;" onclick="triggerUpload(this)">
+                <input type="file" accept="image/*" onchange="previewImg(event,this.parentElement)" onclick="event.stopPropagation()"/>
+            </div>
+            untuk menampilkan hasil filter. <span class="body-cite"></span>
+        </div></li>
+    </ul>
+
+    <div class="body-subtitle">Connection <span class="body-cite"></span></div>
+    <p class="body-text">Untuk kategori connection hanya menampilkan devices yang aktif, apabila terdapat device yang mati maka tidak akan ditampilkan : <span class="body-cite"></span></p>
+    <ul class="steps-list">
+        <li class="step-item"><div class="step-text">Klik icon filter <span class="body-cite"></span>
+            <div class="img-placeholder img-icon" style="width: 80px; height: 35px;" onclick="triggerUpload(this)">
+                <input type="file" accept="image/*" onchange="previewImg(event,this.parentElement)" onclick="event.stopPropagation()"/>
+            </div>
+            di sebelah kanan atas pada menu Transmission Data Acquisition System. <span class="body-cite"></span>
+        </div></li>
+        <li class="step-item"><div class="step-text">Pada kategori connection centang “ ADB Connection ” <span class="body-cite"></span></div></li>
+        <li class="step-item"><div class="step-text">Kemudian klik icon Filter <span class="body-cite"></span>
+            <div class="img-placeholder img-icon" style="width: 80px; height: 35px;" onclick="triggerUpload(this)">
+                <input type="file" accept="image/*" onchange="previewImg(event,this.parentElement)" onclick="event.stopPropagation()"/>
+            </div>
+            untuk menampilkan hasil filter. <span class="body-cite"></span>
+        </div></li>
+    </ul>
+
+    <div class="page-footer">
+        <div class="footer-brand">Commandr Signa PhoneBank</div>
+        <div class="footer-page">05 / 13</div>
+    </div>
+</div>
+
+<!-- ═══════════════ PAGE 6: IAGS Part 1 ═══════════════ -->
+<div class="page page-content" id="p6">
+    <div class="page-header">
+        <div class="page-header-left">
+            <div class="chapter-num">3</div>
+            <div class="chapter-info">
+                <div class="chapter-label">Menu System</div>
+                <div class="chapter-name">Intelligent Account Grazing</div>
+            </div>
+        </div>
+        <div class="page-num-tag">Halaman 06</div>
+    </div>
+
+    <div class="section-title">Intelligent Account Grazing System <span class="body-cite"></span></div>
+    <div class="section-accent"></div>
+
+    <p class="body-text">Menu ini digunakan untuk melihat detail pesan, jumlah pesan yang dikirim, generate job (Membuat tugas untuk farming akun) dan edit profile akun whatsapp yang dipilih. <span class="body-cite"></span></p>
+
+    <div class="img-placeholder img-large" onclick="triggerUpload(this)">
+        <input type="file" accept="image/*" multiple onchange="previewImg(event,this.parentElement)" onclick="event.stopPropagation()"/>
+        <div style="text-align:center;pointer-events:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)">
+            <div style="font-size:32px;margin-bottom:8px">🖼️</div>
+            <div class="ph-label">Gambar 3.1 <span class="body-cite"></span></div>
+        </div>
+    </div>
+
+    <p class="body-text">Berikut adalah langkah-langkah dalam menjalankan fitur-fitur yang terdapat pada menu Intelligent Account Grazing System : <span class="body-cite"></span></p>
+    
+    <div class="body-subtitle">Whatsapp <span class="body-cite"></span></div>
+    <div class="body-subtitle">Detail Account <span class="body-cite"></span></div>
+    <p class="body-text">Pilih akun yang akan dilihat detailnya kemudian klik icon akun tersebut, tampilan akan seperti pada gambar berikut, <span class="body-cite"></span></p>
+
+    <div class="img-placeholder img-large" onclick="triggerUpload(this)">
+        <input type="file" accept="image/*" multiple onchange="previewImg(event,this.parentElement)" onclick="event.stopPropagation()"/>
+        <div style="text-align:center;pointer-events:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)">
+            <div style="font-size:32px;margin-bottom:8px">🖼️</div>
+            <div class="ph-label">Gambar 3.2 <span class="body-cite"></span></div>
+        </div>
+    </div>
+
+    <div class="body-subtitle">Generate <span class="body-cite"></span></div>
+    <ul class="steps-list">
+        <li class="step-item"><div class="step-text">Pilih salah satu akun yang akan di generate <span class="body-cite"></span></div></li>
+        <li class="step-item"><div class="step-text">Kemudian klik tombol generate untuk menambahkan job farming <span class="body-cite"></span></div></li>
+    </ul>
+
+    <div class="img-placeholder img-small" style="padding-top:25%;" onclick="triggerUpload(this)">
+        <input type="file" accept="image/*" onchange="previewImg(event,this.parentElement)" onclick="event.stopPropagation()"/>
+        <div style="text-align:center;pointer-events:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)">
+            <div style="font-size:24px;margin-bottom:4px">🖼️</div>
+            <div class="ph-label">Gambar 3.3 <span class="body-cite"></span></div>
+        </div>
+    </div>
+
+    <div class="page-footer">
+        <div class="footer-brand">Commandr Signa PhoneBank</div>
+        <div class="footer-page">06 / 13</div>
+    </div>
+</div>
+
+<!-- ═══════════════ PAGE 7: IAGS Part 2 ═══════════════ -->
+<div class="page page-content" id="p7">
+    <div class="page-header">
+        <div class="page-header-left">
+            <div class="chapter-num">3</div>
+            <div class="chapter-info">
+                <div class="chapter-label">Lanjutan</div>
+                <div class="chapter-name">Intelligent Account Grazing</div>
+            </div>
+        </div>
+        <div class="page-num-tag">Halaman 07</div>
+    </div>
+
+    <p class="body-text">Jika berhasil maka jumlah pada “ Today’s Messages Job ” akan bertambah secara random. <span class="body-cite"></span></p>
+
+    <div class="img-placeholder img-small" style="padding-top:40%;" onclick="triggerUpload(this)">
+        <input type="file" accept="image/*" onchange="previewImg(event,this.parentElement)" onclick="event.stopPropagation()"/>
+        <div style="text-align:center;pointer-events:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)">
+            <div style="font-size:24px;margin-bottom:4px">🖼️</div>
+            <div class="ph-label">Gambar 3.4 <span class="body-cite"></span></div>
+        </div>
+    </div>
+
+    <div class="body-subtitle">Edit Akun <span class="body-cite"></span></div>
+    <p class="body-text">Untuk mengubah nama akun dan foto profile pada akun whatsapp dapat dilakukan menggunakan fitur edit yang terdapat pada detail akun : <span class="body-cite"></span></p>
+    <ul class="steps-list">
+        <li class="step-item"><div class="step-text">Klik tombol Edit. <span class="body-cite"></span></div></li>
+        <li class="step-item"><div class="step-text">Maka akan muncul tampilan dialog baru. <span class="body-cite"></span></div></li>
+    </ul>
+
+    <div class="img-placeholder img-medium" style="padding-top:30%;" onclick="triggerUpload(this)">
+        <input type="file" accept="image/*" onchange="previewImg(event,this.parentElement)" onclick="event.stopPropagation()"/>
+        <div style="text-align:center;pointer-events:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)">
+            <div style="font-size:32px;margin-bottom:8px">🖼️</div>
+            <div class="ph-label">Gambar 3.5 <span class="body-cite"></span></div>
+        </div>
+    </div>
+
+    <ul class="steps-list">
+        <li class="step-item"><div class="step-text">Klik pada kolom nama profile untuk mengubah nama akun whatsapp. <span class="body-cite"></span></div></li>
+        <li class="step-item"><div class="step-text">Klik pada ikon foto untuk mengubah foto profile akun whatsapp. <span class="body-cite"></span></div></li>
+        <li class="step-item"><div class="step-text">Klik icon “Save Account Setting” untuk menyimpan perubahan. <span class="body-cite"></span></div></li>
+    </ul>
+
+    <div class="body-subtitle">Add Job Manual <span class="body-cite"></span></div>
+    <p class="body-text">Mengirimkan pesan untuk farming juga dapat dilakukan secara manual untuk mengirim pesan kepada target yang berbeda : <span class="body-cite"></span></p>
+
+    <div class="img-placeholder img-large" onclick="triggerUpload(this)">
+        <input type="file" accept="image/*" multiple onchange="previewImg(event,this.parentElement)" onclick="event.stopPropagation()"/>
+        <div style="text-align:center;pointer-events:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)">
+            <div style="font-size:32px;margin-bottom:8px">🖼️</div>
+            <div class="ph-label">Gambar 3.6 <span class="body-cite"></span></div>
+            <div class="ph-sub">Kumpulan gambar fitur Add Job Manual</div>
+        </div>
+    </div>
+
+    <div class="page-footer">
+        <div class="footer-brand">Commandr Signa PhoneBank</div>
+        <div class="footer-page">07 / 13</div>
+    </div>
+</div>
+
+<!-- ═══════════════ PAGE 8: IAGS Part 3 ═══════════════ -->
+<div class="page page-content" id="p8">
+    <div class="page-header">
+        <div class="page-header-left">
+            <div class="chapter-num">3</div>
+            <div class="chapter-info">
+                <div class="chapter-label">Lanjutan</div>
+                <div class="chapter-name">Intelligent Account Grazing</div>
+            </div>
+        </div>
+        <div class="page-num-tag">Halaman 08</div>
+    </div>
+
+    <ul class="steps-list">
+        <li class="step-item"><div class="step-text">Pada akun detail klik icon <span class="body-cite"></span>
+            <div class="img-placeholder img-icon" style="width: 140px; height: 35px;" onclick="triggerUpload(this)">
+                <input type="file" accept="image/*" onchange="previewImg(event,this.parentElement)" onclick="event.stopPropagation()"/>
+            </div>
+        </div></li>
+        <li class="step-item"><div class="step-text">Pilih jenis pesan yang akan dikirim apakah akan disertai video/foto atau hanya pesan saja. <span class="body-cite"></span></div></li>
+        <li class="step-item"><div class="step-text">Masukan target nomor dan pesan yang akan dikirim. <span class="body-cite"></span></div></li>
+        <li class="step-item"><div class="step-text">Jika dengan video/foto maka perlu dimasukkan file yang ingin dikirim bersamaan dengan pesan <span class="body-cite"></span></div></li>
+        <li class="step-item"><div class="step-text">Klik icon <span class="body-cite"></span>
+            <div class="img-placeholder img-icon" style="width: 100px; height: 35px;" onclick="triggerUpload(this)">
+                <input type="file" accept="image/*" onchange="previewImg(event,this.parentElement)" onclick="event.stopPropagation()"/>
+            </div>
+            untuk menambahkan job pesan pada akun tersebut <span class="body-cite"></span>
+        </div></li>
+        <li class="step-item"><div class="step-text">Jika berhasil maka pesan yang baru ditambahkan akan muncul pada tabel message. <span class="body-cite"></span></div></li>
+    </ul>
+
+    <div class="body-subtitle">Filter <span class="body-cite"></span></div>
+    
+    <div class="img-placeholder img-large" onclick="triggerUpload(this)">
+        <input type="file" accept="image/*" multiple onchange="previewImg(event,this.parentElement)" onclick="event.stopPropagation()"/>
+        <div style="text-align:center;pointer-events:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)">
+            <div style="font-size:32px;margin-bottom:8px">🖼️</div>
+            <div class="ph-label">Gambar 3.8 <span class="body-cite"></span></div>
+        </div>
+    </div>
+
+    <p class="body-text">Fitur ini digunakan untuk mengelompokan akun berdasarkan kategori yang dipilih pada menu whatsapp atau menu telegram, berikut langkah-langkahnya : <span class="body-cite"></span></p>
+
+    <div class="body-subtitle">Job Progress <span class="body-cite"></span></div>
+    <p class="body-text">Kategori “Job Progress” digunakan untuk menampilkan akun yang akan mengirim jenis pesan sesuai kategori yang dipilih : <span class="body-cite"></span></p>
+
+    <div class="img-placeholder img-small" style="padding-top:40%;" onclick="triggerUpload(this)">
+        <input type="file" accept="image/*" onchange="previewImg(event,this.parentElement)" onclick="event.stopPropagation()"/>
+        <div style="text-align:center;pointer-events:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)">
+            <div style="font-size:24px;margin-bottom:4px">🖼️</div>
+            <div class="ph-label">Gambar 3.9 <span class="body-cite"></span></div>
+        </div>
+    </div>
+
+    <ul class="steps-list">
+        <li class="step-item"><div class="step-text">Klik icon filter pada menu smart foraging system <span class="body-cite"></span></div></li>
+        <li class="step-item"><div class="step-text">Muncul tampilan dialog filter account <span class="body-cite"></span></div></li>
+        <li class="step-item"><div class="step-text">Pada kategori job progress pilih salah satu dari 3 tipe : <span class="body-cite"></span><br>
+            - Chat , Akun yang di filter memiliki tugas untuk mengirim pesan text <span class="body-cite"></span><br>
+            - Image , Akun yang di filter memiliki tugas untuk mengirim pesan gambar <span class="body-cite"></span><br>
+            - Video , Akun yang difilter memiliki tugas untuk mengirim pesan video <span class="body-cite"></span>
+        </div></li>
+        <li class="step-item"><div class="step-text">Klik icon filter <span class="body-cite"></span>
+            <div class="img-placeholder img-icon" style="width: 80px; height: 35px;" onclick="triggerUpload(this)">
+                <input type="file" accept="image/*" onchange="previewImg(event,this.parentElement)" onclick="event.stopPropagation()"/>
+            </div>
+            untuk menerapkan filternya <span class="body-cite"></span>
+        </div></li>
+    </ul>
+
+    <div class="page-footer">
+        <div class="footer-brand">Commandr Signa PhoneBank</div>
+        <div class="footer-page">08 / 13</div>
+    </div>
+</div>
+
+<!-- ═══════════════ PAGE 9: IAGS Part 4 & RAMS ═══════════════ -->
+<div class="page page-content" id="p9">
+    <div class="page-header">
+        <div class="page-header-left">
+            <div class="chapter-num">4</div>
+            <div class="chapter-info">
+                <div class="chapter-label">Menu System</div>
+                <div class="chapter-name">Ripe Account Management</div>
+            </div>
+        </div>
+        <div class="page-num-tag">Halaman 09</div>
+    </div>
+
+    <div class="body-subtitle" style="margin-top:0;">Account Exist <span class="body-cite"></span></div>
+    
+    <div class="img-placeholder img-small" style="padding-top:40%;" onclick="triggerUpload(this)">
+        <input type="file" accept="image/*" onchange="previewImg(event,this.parentElement)" onclick="event.stopPropagation()"/>
+        <div style="text-align:center;pointer-events:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)">
+            <div style="font-size:24px;margin-bottom:4px">🖼️</div>
+            <div class="ph-label">Gambar 3.10 <span class="body-cite"></span></div>
+        </div>
+    </div>
+
+    <p class="body-text">Kategori account exist merupakan filter untuk melihat akun pada device yang whatsappnya dalam status aktif, berikut langkah-langkahnya : <span class="body-cite"></span></p>
+
+    <ul class="steps-list">
+        <li class="step-item"><div class="step-text">Klik icon filter <span class="body-cite"></span>
+            <div class="img-placeholder img-icon" style="width: 50px; height: 40px;" onclick="triggerUpload(this)">
+                <input type="file" accept="image/*" onchange="previewImg(event,this.parentElement)" onclick="event.stopPropagation()"/>
+            </div>
+            pada menu smart foraging system <span class="body-cite"></span>
+        </div></li>
+        <li class="step-item"><div class="step-text">Muncul tampilan dialog filter account <span class="body-cite"></span></div></li>
+        <li class="step-item"><div class="step-text">Pada kategori Account Exist ceklis whatsapp exist . <span class="body-cite"></span></div></li>
+        <li class="step-item"><div class="step-text">Klik icon filter <span class="body-cite"></span>
+            <div class="img-placeholder img-icon" style="width: 80px; height: 35px;" onclick="triggerUpload(this)">
+                <input type="file" accept="image/*" onchange="previewImg(event,this.parentElement)" onclick="event.stopPropagation()"/>
+            </div>
+            untuk menerapkan filternya <span class="body-cite"></span>
+        </div></li>
+    </ul>
+
+    <div class="section-title">Ripe Account Management System <span class="body-cite"></span></div>
+    <div class="section-accent"></div>
+
+    <div class="img-placeholder img-large" onclick="triggerUpload(this)">
+        <input type="file" accept="image/*" multiple onchange="previewImg(event,this.parentElement)" onclick="event.stopPropagation()"/>
+        <div style="text-align:center;pointer-events:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)">
+            <div style="font-size:32px;margin-bottom:8px">🖼️</div>
+            <div class="ph-label">Gambar 4.1 <span class="body-cite"></span></div>
+        </div>
+    </div>
+
+    <p class="body-text">Menu ini digunakan untuk memilih atau menambahkan daftar akun yang akan digunakan sebagai sender whatsapp, berikut langkah-langkah dalam menambahkan akun yang akan digunakan sebagai pengirim : <span class="body-cite"></span></p>
+
+    <div class="body-subtitle">Whatsapp <span class="body-cite"></span></div>
+    <ul class="steps-list">
+        <li class="step-item"><div class="step-text">Select nama-nama akun yang akan digunakan untuk sender : <span class="body-cite"></span><br>
+            - Warna yang lebih terang, akun terpilih sebagai sender <span class="body-cite"></span><br>
+            - Warna yang tidak terang, akun tidak terpilih sebagai sender <span class="body-cite"></span>
+        </div></li>
+    </ul>
+
+    <div class="page-footer">
+        <div class="footer-brand">Commandr Signa PhoneBank</div>
+        <div class="footer-page">09 / 13</div>
+    </div>
+</div>
+
+<!-- ═══════════════ PAGE 10: RAMS Part 2 ═══════════════ -->
+<div class="page page-content" id="p10">
+    <div class="page-header">
+        <div class="page-header-left">
+            <div class="chapter-num">4</div>
+            <div class="chapter-info">
+                <div class="chapter-label">Lanjutan</div>
+                <div class="chapter-name">Ripe Account Management</div>
+            </div>
+        </div>
+        <div class="page-num-tag">Halaman 10</div>
+    </div>
+
+    <div class="img-placeholder img-large" onclick="triggerUpload(this)">
+        <input type="file" accept="image/*" multiple onchange="previewImg(event,this.parentElement)" onclick="event.stopPropagation()"/>
+        <div style="text-align:center;pointer-events:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)">
+            <div style="font-size:32px;margin-bottom:8px">🖼️</div>
+            <div class="ph-label">Gambar 4.2 <span class="body-cite"></span></div>
+        </div>
+    </div>
+
+    <ul class="steps-list">
+        <li class="step-item"><div class="step-text">Setelah memilih akun-akun yang akan digunakan, pada bagian paling atas klik icon <span class="body-cite"></span>
+            <div class="img-placeholder img-icon" style="width: 120px; height: 35px;" onclick="triggerUpload(this)">
+                <input type="file" accept="image/*" onchange="previewImg(event,this.parentElement)" onclick="event.stopPropagation()"/>
+            </div>
+        </div></li>
+        <li class="step-item"><div class="step-text">Setelah disave maka akun yang tadi dipilih akan berubah statusnya dari not connect menjadi connected . <span class="body-cite"></span></div></li>
+    </ul>
+
+    <div class="img-placeholder img-medium" style="padding-top:25%" onclick="triggerUpload(this)">
+        <input type="file" accept="image/*" onchange="previewImg(event,this.parentElement)" onclick="event.stopPropagation()"/>
+        <div style="text-align:center;pointer-events:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)">
+            <span style="font-size:12px; color:#718096">Upload Gambar connected</span>
+        </div>
+    </div>
+
+    <p class="body-text">Akun siap digunakan untuk mengirim pesan. <span class="body-cite"></span></p>
+
+    <div class="body-subtitle">Filter <span class="body-cite"></span></div>
+    <p class="body-text">Fitur ini digunakan untuk mengellompokan akun berdasarkan kategori yang dipilih, berikut langkah-langkah dalam melakukan filter akun : <span class="body-cite"></span></p>
+
+    <div class="img-placeholder img-large" onclick="triggerUpload(this)">
+        <input type="file" accept="image/*" multiple onchange="previewImg(event,this.parentElement)" onclick="event.stopPropagation()"/>
+        <div style="text-align:center;pointer-events:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)">
+            <div style="font-size:32px;margin-bottom:8px">🖼️</div>
+            <div class="ph-label">Gambar 4.3 <span class="body-cite"></span></div>
+        </div>
+    </div>
+
+    <ul class="steps-list">
+        <li class="step-item"><div class="step-text">Klik icon filter di pojok sebelah kanan <span class="body-cite"></span>
+            <div class="img-placeholder img-icon" style="width: 50px; height: 40px;" onclick="triggerUpload(this)">
+                <input type="file" accept="image/*" onchange="previewImg(event,this.parentElement)" onclick="event.stopPropagation()"/>
+            </div>
+        </div></li>
+        <li class="step-item"><div class="step-text">Muncul dialog baru untuk filter account <span class="body-cite"></span></div></li>
+    </ul>
+
+    <div class="img-placeholder img-small" style="padding-top:40%" onclick="triggerUpload(this)">
+        <input type="file" accept="image/*" onchange="previewImg(event,this.parentElement)" onclick="event.stopPropagation()"/>
+        <div style="text-align:center;pointer-events:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)">
+            <div style="font-size:24px;margin-bottom:4px">🖼️</div>
+            <div class="ph-label">Gambar 4.4 <span class="body-cite"></span></div>
+        </div>
+    </div>
+
+    <ul class="steps-list">
+        <li class="step-item"><div class="step-text">Ceklis kategori yang akan dipilih : <span class="body-cite"></span><br>
+            - Riped Account, Mengelompokan akun yang telah dipilih untuk digunakan sebagai sender <span class="body-cite"></span><br>
+            - Account Exist, Mengelompokan akun yang aktif dan dapat digunakan sebagai sender <span class="body-cite"></span><br>
+            - Connection, Mengelompokan akun berdasarkan device ADB yang aktif <span class="body-cite"></span>
+        </div></li>
+    </ul>
+
+    <div class="page-footer">
+        <div class="footer-brand">Commandr Signa PhoneBank</div>
+        <div class="footer-page">10 / 13</div>
+    </div>
+</div>
+
+<!-- ═══════════════ PAGE 11: AI-Text & Farming Rule ═══════════════ -->
+<div class="page page-content" id="p11">
+    <div class="page-header">
+        <div class="page-header-left">
+            <div class="chapter-num">5</div>
+            <div class="chapter-info">
+                <div class="chapter-label">Menu System</div>
+                <div class="chapter-name">AI-Text Optimization &amp; Farming Rule</div>
+            </div>
+        </div>
+        <div class="page-num-tag">Halaman 11</div>
+    </div>
+
+    <div class="section-title">AI-Text Optimization Platform <span class="body-cite"></span></div>
+    <div class="section-accent"></div>
+
+    <p class="body-text">Pesan sudah diolah dengan menggunakan sistem pengolahan AI yang mampu membuat konten dan laporan secara mandiri sesuai tema, topik, sasaran audiens, dan geografi. <span class="body-cite"></span></p>
+    <p class="body-text">Sistem pelaporan menggunakan basis perintah prompt secara mandiri yang digunakan sesuai dengan gaya bahasa dari masing-masing pengguna. <span class="body-cite"></span></p>
+
+    <div class="img-placeholder img-large" onclick="triggerUpload(this)">
+        <input type="file" accept="image/*" multiple onchange="previewImg(event,this.parentElement)" onclick="event.stopPropagation()"/>
+        <div style="text-align:center;pointer-events:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)">
+            <div style="font-size:32px;margin-bottom:8px">🖼️</div>
+            <div class="ph-label">Gambar 5.1 <span class="body-cite"></span></div>
+        </div>
+    </div>
+
+    <div class="body-subtitle" style="margin-top:40px;">Level Setting <span class="body-cite"></span></div>
+    <p class="body-text">Fitur ini digunakan untuk farming akun sender, sehingga akun-akun yang baru di registrasi tidak dianggap akun bot oleh whatsapp. <span class="body-cite"></span></p>
+    <p class="body-text">Sistem ini akan berjalan otomatis sesuai dengan aturan yang telah dibuat : <span class="body-cite"></span></p>
+
+    <div class="img-placeholder img-large" onclick="triggerUpload(this)">
+        <input type="file" accept="image/*" multiple onchange="previewImg(event,this.parentElement)" onclick="event.stopPropagation()"/>
+        <div style="text-align:center;pointer-events:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)">
+            <div style="font-size:32px;margin-bottom:8px">🖼️</div>
+            <div class="ph-label">Gambar 6.1 <span class="body-cite"></span></div>
+        </div>
+    </div>
+
+    <div class="body-subtitle">Add Level <span class="body-cite"></span></div>
+    <p class="body-text">Fitur ini digunakan untuk menambah aturan baru untuk farming, berikut langkah-langkah untuk menambahkan level farming : <span class="body-cite"></span></p>
+    <ul class="steps-list">
+        <li class="step-item"><div class="step-text">Klik icon add level <span class="body-cite"></span>
+            <div class="img-placeholder img-icon" style="width: 100px; height: 35px;" onclick="triggerUpload(this)">
+                <input type="file" accept="image/*" onchange="previewImg(event,this.parentElement)" onclick="event.stopPropagation()"/>
+            </div>
+        </div></li>
+        <li class="step-item"><div class="step-text">Muncul dialog “ add new level ” <span class="body-cite"></span></div></li>
+    </ul>
+
+    <div class="page-footer">
+        <div class="footer-brand">Commandr Signa PhoneBank</div>
+        <div class="footer-page">11 / 13</div>
+    </div>
+</div>
+
+<!-- ═══════════════ PAGE 12: Farming Rule Lanjutan ═══════════════ -->
+<div class="page page-content" id="p12">
+    <div class="page-header">
+        <div class="page-header-left">
+            <div class="chapter-num">6</div>
+            <div class="chapter-info">
+                <div class="chapter-label">Lanjutan</div>
+                <div class="chapter-name">Farming Rule</div>
+            </div>
+        </div>
+        <div class="page-num-tag">Halaman 12</div>
+    </div>
+
+    <div class="img-placeholder img-medium" style="padding-top:40%;" onclick="triggerUpload(this)">
+        <input type="file" accept="image/*" onchange="previewImg(event,this.parentElement)" onclick="event.stopPropagation()"/>
+        <div style="text-align:center;pointer-events:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)">
+            <div style="font-size:32px;margin-bottom:8px">🖼️</div>
+            <div class="ph-label">Gambar 6.2 <span class="body-cite"></span></div>
+        </div>
+    </div>
+
+    <ul class="steps-list">
+        <li class="step-item"><div class="step-text">Isi field yang tersedia sesuai dengan aturan yang akan ditambahkan <span class="body-cite"></span><br>
+            - Level, Berfungsi untuk penamaan aturan akun yang dibuat <span class="body-cite"></span><br>
+            - Age, Berfungsi untuk menendakan range umur akun dengan aturan yang dibuat <span class="body-cite"></span><br>
+            - Time Start, Berfungsi untuk menentukan jam mulai mengirim pesan <span class="body-cite"></span><br>
+            - Time End, Berfungsi untuk menentukan jam selesai mengirim pesan <span class="body-cite"></span><br>
+            - Job Setting, Berfungsi untuk menentukan range jumlah konten yang akan dikirim <span class="body-cite"></span>
+        </div></li>
+        <li class="step-item"><div class="step-text">Setelah selesai mengisi kemudian tekan icon “ Add Level ” <span class="body-cite"></span>
+            <div class="img-placeholder img-icon" style="width: 100px; height: 35px;" onclick="triggerUpload(this)">
+                <input type="file" accept="image/*" onchange="previewImg(event,this.parentElement)" onclick="event.stopPropagation()"/>
+            </div>
+        </div></li>
+    </ul>
+
+    <div class="body-subtitle">Edit <span class="body-cite"></span></div>
+    <p class="body-text">Edit digunakan untuk mengubah aturan yang sudah ada, berikut adalah langkah-langkah dalam melakukan edit : <span class="body-cite"></span></p>
+
+    <ul class="steps-list">
+        <li class="step-item"><div class="step-text">Tekan icon <span class="body-cite"></span>
+            <div class="img-placeholder img-icon" style="width: 40px; height: 40px;" onclick="triggerUpload(this)">
+                <input type="file" accept="image/*" onchange="previewImg(event,this.parentElement)" onclick="event.stopPropagation()"/>
+            </div>
+        </div></li>
+    </ul>
+
+    <div class="img-placeholder img-medium" style="padding-top:25%;" onclick="triggerUpload(this)">
+        <input type="file" accept="image/*" onchange="previewImg(event,this.parentElement)" onclick="event.stopPropagation()"/>
+        <div style="text-align:center;pointer-events:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)">
+            <div style="font-size:32px;margin-bottom:8px">🖼️</div>
+            <div class="ph-label">Gambar 6.3 <span class="body-cite"></span></div>
+        </div>
+    </div>
+
+    <ul class="steps-list">
+        <li class="step-item"><div class="step-text">Muncul dialog baru “ Edit Level ” <span class="body-cite"></span></div></li>
+    </ul>
+
+    <div class="img-placeholder img-medium" style="padding-top:35%;" onclick="triggerUpload(this)">
+        <input type="file" accept="image/*" onchange="previewImg(event,this.parentElement)" onclick="event.stopPropagation()"/>
+        <div style="text-align:center;pointer-events:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)">
+            <div style="font-size:32px;margin-bottom:8px">🖼️</div>
+            <div class="ph-label">Gambar 6.4 <span class="body-cite"></span></div>
+        </div>
+    </div>
+
+    <ul class="steps-list">
+        <li class="step-item"><div class="step-text">Klik field sesuai data yang akan dirubah <span class="body-cite"></span></div></li>
+        <li class="step-item"><div class="step-text">Klik icon “update level” untuk menyimpan perubahan <span class="body-cite"></span></div></li>
+    </ul>
+
+    <div class="page-footer">
+        <div class="footer-brand">Commandr Signa PhoneBank</div>
+        <div class="footer-page">12 / 13</div>
+    </div>
+</div>
+
+<!-- ═══════════════ PAGE 13: Farming Rule & Control Panel ═══════════════ -->
+<div class="page page-content" id="p13">
+    <div class="page-header">
+        <div class="page-header-left">
+            <div class="chapter-num">7</div>
+            <div class="chapter-info">
+                <div class="chapter-label">Menu System</div>
+                <div class="chapter-name">Control Panel</div>
+            </div>
+        </div>
+        <div class="page-num-tag">Halaman 13</div>
+    </div>
+
+    <div class="body-subtitle" style="margin-top:0;">Delete <span class="body-cite"></span></div>
+    <p class="body-text">Delete digunakan untuk menghapus aturan yang telah dibuat, berikut adalah langkah-langkah untuk melakukan hapus aturan farming : <span class="body-cite"></span></p>
+
+    <div class="img-placeholder img-medium" style="padding-top:25%;" onclick="triggerUpload(this)">
+        <input type="file" accept="image/*" onchange="previewImg(event,this.parentElement)" onclick="event.stopPropagation()"/>
+        <div style="text-align:center;pointer-events:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)">
+            <div style="font-size:32px;margin-bottom:8px">🖼️</div>
+            <div class="ph-label">Gambar 6.5 <span class="body-cite"></span></div>
+        </div>
+    </div>
+
+    <ul class="steps-list">
+        <li class="step-item"><div class="step-text">Klik icon hapus <span class="body-cite"></span>
+            <div class="img-placeholder img-icon" style="width: 40px; height: 40px;" onclick="triggerUpload(this)">
+                <input type="file" accept="image/*" onchange="previewImg(event,this.parentElement)" onclick="event.stopPropagation()"/>
+            </div>
+        </div></li>
+        <li class="step-item"><div class="step-text">Jika berhasil aturan yang dipilih akan hilang dari level setting <span class="body-cite"></span></div></li>
+    </ul>
+
+    <div class="section-title">Control Panel <span class="body-cite"></span></div>
+    <div class="section-accent"></div>
+
+    <p class="body-text">Control panel digunakan untuk melihat semua device yang sedang aktif dan mengontrol penggunaan semua device hp baik dari turn on/off device dan connect/disconnect device. <span class="body-cite"></span></p>
+    <p class="body-text">Berikut langkah-langkahnya: <span class="body-cite"></span></p>
+
+    <div class="img-placeholder img-large" onclick="triggerUpload(this)">
+        <input type="file" accept="image/*" multiple onchange="previewImg(event,this.parentElement)" onclick="event.stopPropagation()"/>
+        <div style="text-align:center;pointer-events:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)">
+            <div style="font-size:32px;margin-bottom:8px">🖼️</div>
+            <div class="ph-label">Gambar 6.6 <span class="body-cite"></span></div>
+        </div>
+    </div>
+
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
+        <ul class="steps-list" style="margin:0;">
+            <li class="step-item"><div class="step-text"><strong>Power On:</strong> <span class="body-cite"></span><br>Input Device Number <span class="body-cite"></span><br>Klik button Power On untuk menyalakan device <span class="body-cite"></span></div></li>
+            <li class="step-item"><div class="step-text"><strong>Power Off:</strong> <span class="body-cite"></span><br>Input Device Number <span class="body-cite"></span><br>Klik button Power Off untuk memadamkan device <span class="body-cite"></span></div></li>
+            <li class="step-item"><div class="step-text"><strong>Connect:</strong> <span class="body-cite"></span><br>Input Device Number <span class="body-cite"></span><br>Klik button Connect untuk menghubungkan koneksi device <span class="body-cite"></span></div></li>
+            <li class="step-item"><div class="step-text"><strong>Disconnect:</strong> <span class="body-cite"></span><br>Input Device Number <span class="body-cite"></span><br>Klik button Disconnect untuk memutuskan koneksi device <span class="body-cite"></span></div></li>
+            <li class="step-item"><div class="step-text"><strong>Wake:</strong> <span class="body-cite"></span><br>Input Device Number <span class="body-cite"></span><br>Klik button Wake untuk menghidupkan device <span class="body-cite"></span></div></li>
+        </ul>
+        <ul class="steps-list" style="margin:0;">
+            <li class="step-item" style="border-left-color: #00e676;"><div class="step-text"><strong>Power On All:</strong> <span class="body-cite"></span><br>Input Device Number <span class="body-cite"></span><br>Klik button Power On All untuk menyalakan semua device <span class="body-cite"></span></div></li>
+            <li class="step-item" style="border-left-color: #00e676;"><div class="step-text"><strong>Power Off All:</strong> <span class="body-cite"></span><br>Input Device Number <span class="body-cite"></span><br>Klik button Power Off All untuk memadamkan semua device <span class="body-cite"></span></div></li>
+            <li class="step-item" style="border-left-color: #00e676;"><div class="step-text"><strong>Connect All:</strong> <span class="body-cite"></span><br>Input Device Number <span class="body-cite"></span><br>Klik button Connect All untuk menghubungkan koneksi semua device <span class="body-cite"></span></div></li>
+            <li class="step-item" style="border-left-color: #00e676;"><div class="step-text"><strong>Disconnect All:</strong> <span class="body-cite"></span><br>Input Device Number <span class="body-cite"></span><br>Klik button Disconnect All untuk memutuskan koneksi semua device <span class="body-cite"></span></div></li>
+            <li class="step-item" style="border-left-color: #00e676;"><div class="step-text"><strong>Wake All:</strong> <span class="body-cite"></span><br>Input Device Number <span class="body-cite"></span><br>Klik button Wake All untuk menghidupkan semua device <span class="body-cite"></span></div></li>
+        </ul>
+    </div>
+
+    <div class="page-footer">
+        <div class="footer-brand">Commandr Signa PhoneBank</div>
+        <div class="footer-page">13 / 13</div>
+    </div>
+</div>
+
+</div><!-- end pdf-pages -->
+
+<script>
+let coverBgColor = '#0a0e1a';
+
+function closeColorDropdown() {
+  const menu = document.getElementById('colorMenu');
+  if (menu) {
+    menu.classList.remove('show');
+  }
+}
+
+function toggleColorDropdown(e) {
+  if (e && e.stopPropagation) {
+    e.stopPropagation();
+  }
+  const menu = document.getElementById('colorMenu');
+  if (!menu) return;
+  menu.classList.toggle('show');
+}
+
+document.addEventListener('click', function(e) {
+  const menu = document.getElementById('colorMenu');
+  const btn = document.getElementById('colorBtn');
+  if (menu && btn && !menu.contains(e.target) && e.target !== btn && !btn.contains(e.target)) {
+    menu.classList.remove('show');
+  }
+});
+
+function selectColor(el) {
+  const color = el.getAttribute('data-color');
+  const hex = el.getAttribute('data-hex');
+  coverBgColor = hex;
+  
+  const cover = document.getElementById('p1');
+  cover.style.background = color;
+  
+  // Update main preview
+  document.getElementById('colorPreview').style.background = el.querySelector('.color-preview').style.background;
+  
+  // Save to localStorage
+  localStorage.setItem('cover_color_style', color);
+  localStorage.setItem('cover_color_hex', hex);
+  localStorage.setItem('cover_color_type', 'preset');
+  
+  // Update active state
+  document.querySelectorAll('.color-dropdown-menu .color-option').forEach(opt => {
+    opt.classList.remove('active');
+  });
+  el.classList.add('active');
+  // hide custom panel if showing
+  const panel = document.getElementById('customGradientPanel'); if (panel) panel.classList.remove('show');
+  closeColorDropdown();
+}
+
+function triggerCustomColorInput(e) {
+  const input = document.getElementById('customColorInput');
+  input.click();
+  // show panel when user opens custom color
+  const panel = document.getElementById('customGradientPanel');
+  if (panel) panel.classList.add('show');
+}
+
+function normalizeHex(hex) {
+  hex = hex.replace('#', '');
+  if (hex.length === 3) {
+    hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+  }
+  return '#' + hex;
+}
+
+function darkenColor(hex, percent) {
+  let num = parseInt(hex.replace("#",""), 16),
+      amt = Math.round(2.55 * percent),
+      R = (num >> 16) - amt,
+      G = (num >> 8 & 0x00FF) - amt,
+      B = (num & 0x0000FF) - amt;
+  return "#" + (0x1000000 + (R<0?0:R>255?255:R)*0x10000 + (G<0?0:G>255?255:G)*0x100 + (B<0?0:B>255?255:B)).toString(16).slice(1);
+}
+
+function applyCustomColor(color) {
+  const normColor = normalizeHex(color);
+  coverBgColor = normColor;
+  const darker = darkenColor(normColor, 40);
+  const gradient = `linear-gradient(145deg, ${normColor} 0%, ${darker} 100%)`;
+  
+  const cover = document.getElementById('p1');
+  cover.style.background = gradient;
+  
+  // Update previews
+  document.getElementById('colorPreview').style.background = normColor;
+  
+  // Save to localStorage
+  localStorage.setItem('cover_color_style', gradient);
+  localStorage.setItem('cover_color_hex', normColor);
+  localStorage.setItem('cover_color_type', 'custom');
+  
+  // Update active state in menu
+  document.querySelectorAll('.color-dropdown-menu .color-option').forEach(opt => {
+    opt.classList.remove('active');
+  });
+  document.querySelector('.custom-color-option').classList.add('active');
+  document.getElementById('customColorInput').value = normColor;
+  // populate gradient inputs if present
+  const sEl = document.getElementById('customGradientStart');
+  const eEl = document.getElementById('customGradientEnd');
+  const aEl = document.getElementById('customGradientAngle');
+  if (sEl) sEl.value = normColor;
+  if (eEl) eEl.value = darker;
+  if (aEl) aEl.value = 145;
+  const panel = document.getElementById('customGradientPanel'); if (panel) panel.classList.add('show');
+}
+
+function applyCustomGradient() {
+  const start = document.getElementById('customGradientStart').value || '#0a0e1a';
+  const end = document.getElementById('customGradientEnd').value || '#0a1f2e';
+  const angle = parseInt(document.getElementById('customGradientAngle').value || '145', 10);
+  const gradient = `linear-gradient(${angle}deg, ${start} 0%, ${end} 100%)`;
+  const cover = document.getElementById('p1');
+  cover.style.background = gradient;
+  document.getElementById('colorPreview').style.background = gradient;
+  document.getElementById('customGradientAngleVal').textContent = angle + '°';
+  // persist
+  localStorage.setItem('cover_color_style', gradient);
+  localStorage.setItem('cover_color_hex', start);
+  localStorage.setItem('cover_color_type', 'custom');
+  // mark active
+  document.querySelectorAll('.color-dropdown-menu .color-option').forEach(opt => opt.classList.remove('active'));
+  document.querySelector('.custom-color-option').classList.add('active');
+}
+
+function toggleCoverGlow(enabled) {
+  const cover = document.getElementById('p1');
+  if (enabled) {
+    cover.classList.add('cover-glow-active');
+  } else {
+    cover.classList.remove('cover-glow-active');
+  }
+  localStorage.setItem('cover_glow_enabled', enabled ? '1' : '0');
+}
+
+/* Buletan/Grid style toggles removed */
+
+function updateGlowSize(value) {
+  const cover = document.getElementById('p1');
+  const size = `${value}px`;
+  cover.style.setProperty('--cover-ring-size', size);
+  document.getElementById('coverGlowSizeLabel').textContent = size;
+  localStorage.setItem('cover_glow_size', value);
+}
+
+function updateGlowColors() {
+  const color = document.getElementById('coverGlowColor').value;
+  const cover = document.getElementById('p1');
+  cover.style.setProperty('--cover-ring-color-1', `${color}40`);
+  cover.style.setProperty('--cover-ring-color-2', `${color}40`);
+  localStorage.setItem('cover_glow_color', color);
+}
+
+function initCoverStyle() {
+  const glowEnabled = localStorage.getItem('cover_glow_enabled');
+  const savedGlowSize = localStorage.getItem('cover_glow_size') || '140';
+  const savedGlowColor = localStorage.getItem('cover_glow_color') || '#00d2ff';
+  document.getElementById('glowBulatanToggle').checked = glowEnabled !== '0';
+  document.getElementById('coverGlowSize').value = savedGlowSize;
+  document.getElementById('coverGlowColor').value = savedGlowColor;
+
+  updateGlowSize(savedGlowSize);
+  updateGlowColors();
+  toggleCoverGlow(glowEnabled !== '0');
+  // Buletan/Grid removed — no additional style toggles to apply
+}
+
+function initCoverColor() {
+  const savedStyle = localStorage.getItem('cover_color_style');
+  const savedHex = localStorage.getItem('cover_color_hex');
+  const savedType = localStorage.getItem('cover_color_type');
+  
+  if (savedStyle && savedHex) {
+    coverBgColor = savedHex;
+    const cover = document.getElementById('p1');
+    cover.style.background = savedStyle;
+    
+    document.querySelectorAll('.color-dropdown-menu .color-option').forEach(opt => {
+      opt.classList.remove('active');
+    });
+    
+    if (savedType === 'custom') {
+      const customOpt = document.querySelector('.custom-color-option');
+      customOpt.classList.add('active');
+      document.getElementById('customColorInput').value = savedHex;
+      // If saved style is a gradient, try to parse and populate gradient inputs
+      document.getElementById('colorPreview').style.background = savedStyle.includes('linear-gradient') ? savedStyle : savedHex;
+      const panel = document.getElementById('customGradientPanel');
+      if (panel) panel.classList.add('show');
+      try {
+        if (savedStyle && savedStyle.includes('linear-gradient')) {
+          // Attempt simple parse: linear-gradient(angledeg, start, end)
+          const m = savedStyle.match(/linear-gradient\(([^,]+),\s*([^,]+)\s*\d+%?,\s*([^\)]+)\)/);
+          if (m) {
+            const angle = m[1].replace('deg','').trim();
+            const start = m[2].replace(/\s*\d+%/,'').trim();
+            const end = m[3].replace(/\s*\d+%/,'').trim();
+            const sEl = document.getElementById('customGradientStart');
+            const eEl = document.getElementById('customGradientEnd');
+            const aEl = document.getElementById('customGradientAngle');
+            if (sEl) sEl.value = start;
+            if (eEl) eEl.value = end;
+            if (aEl) aEl.value = parseInt(angle,10) || 145;
+            const av = document.getElementById('customGradientAngleVal'); if (av) av.textContent = (aEl.value||145)+'°';
+          }
+        }
+      } catch (err) { /* ignore parse errors */ }
+      // restore corner radii if any
+      try {
+        const radii = JSON.parse(localStorage.getItem('cover_corner_radii') || '{}');
+        if (radii && document.getElementById('cornerTL')) {
+          document.getElementById('cornerTL').value = radii.tl || 0;
+          document.getElementById('cornerTR').value = radii.tr || 0;
+          document.getElementById('cornerBR').value = radii.br || 0;
+          document.getElementById('cornerBL').value = radii.bl || 0;
+          applyCornerRadius();
+        }
+      } catch(e){}
+    } else {
+      let found = false;
+      document.querySelectorAll('.color-dropdown-menu .color-option').forEach(opt => {
+        if (opt.getAttribute('data-color') === savedStyle) {
+          opt.classList.add('active');
+          document.getElementById('colorPreview').style.background = opt.querySelector('.color-preview').style.background;
+          found = true;
+        }
+      });
+      if (!found) {
+        document.querySelector('.color-option[data-name="default"]').classList.add('active');
+      }
+    }
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+      initCoverColor();
+      initCoverStyle();
+    });
+
+function triggerUpload(el){el.querySelector('input[type=file]').click()}
+
+// Hitung total gambar yang sudah di-upload dari semua placeholder LAIN
+function countGlobalImages(excludeContainer) {
+  let total = 0;
+  document.querySelectorAll('.img-placeholder').forEach(ph => {
+    if (ph === excludeContainer) return;
+    total += parseInt(ph.getAttribute('data-img-count') || '0');
+  });
+  return total;
+}
+
+function previewImg(e, container) {
+  const files = Array.from(e.target.files);
+  if (files.length === 0) return;
+  
+  const isMultiple = e.target.hasAttribute('multiple');
+  
+  // Clean up existing previews
+  const oldGrid = container.querySelector('.img-preview-grid');
+  if (oldGrid) oldGrid.remove();
+  const oldImg = container.querySelector('img');
+  if (oldImg) oldImg.remove();
+  // Hapus caption lama jika ada
+  const oldCaptionDirect = container.nextElementSibling;
+  if (oldCaptionDirect && oldCaptionDirect.classList && oldCaptionDirect.classList.contains('img-uploaded-caption')) {
+    oldCaptionDirect.remove();
+  }
+
+  // Hitung nomor awal berdasarkan gambar dari placeholder lain
+  // Gambar icon (img-icon) tidak dihitung dan tidak diberi keterangan
+  const isIcon = container.classList.contains('img-icon');
+  const startNum = isIcon ? 0 : (countGlobalImages(container) + 1);
+
+  if (isMultiple) {
+    const maxFiles = files.slice(0, 4);
+    const grid = document.createElement('div');
+    grid.className = 'img-preview-grid';
+    if (maxFiles.length === 1) grid.classList.add('single-img');
+
+    maxFiles.forEach((file, idx) => {
+      const item = document.createElement('div');
+      item.className = 'img-grid-item';
+
+      const img = document.createElement('img');
+      img.onload = () => { if (window.resizeDroppedImageWrapper) window.resizeDroppedImageWrapper(container, img); };
+      const reader = new FileReader();
+      reader.onload = e => {
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+      
+      img.alt = 'Gambar ' + (startNum + idx);
+      item.appendChild(img);
+
+      const cap = document.createElement('div');
+      cap.className = 'img-grid-caption editable-text';
+      cap.setAttribute('onclick', 'makeEditable(this)');
+      // Icon tidak diberi nomor keterangan
+      if (!isIcon) {
+        cap.textContent = 'Contoh Gambar ' + (startNum + idx);
+      }
+      item.appendChild(cap);
+
+      grid.appendChild(item);
+    });
+
+    container.appendChild(grid);
+    // Simpan jumlah gambar di placeholder ini (icon tidak dihitung)
+    if (!isIcon) container.setAttribute('data-img-count', maxFiles.length);
+    // Reinitialize editable elements untuk include grid captions yang baru dibuat
+    if (window.initEditableElements) {
+      window.initEditableElements();
+    }
+
+  } else {
+    const img = document.createElement('img');
+    img.onload = () => { if (window.resizeDroppedImageWrapper) window.resizeDroppedImageWrapper(container, img); };
+    const reader = new FileReader();
+    reader.onload = e => {
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(files[0]);
+    container.appendChild(img);
+    if (!isIcon) container.setAttribute('data-img-count', '1');
+    // Reinitialize editable elements untuk single image
+    if (window.initEditableElements) {
+      window.initEditableElements();
+    }
+  }
+  
+  // Sembunyikan placeholder text, tapi jangan sembunyikan isi grid
+  const children = container.querySelectorAll('div');
+  children.forEach(child => {
+    if (!child.classList.contains('img-preview-grid') && !child.closest('.img-preview-grid')) {
+      child.style.display = 'none';
+    }
+  });
+
+  // Tandai placeholder sudah ada gambar → hapus border putus-putus
+  container.classList.add('has-image');
+
+  // Caption untuk single upload (berurutan global) — skip untuk img-icon
+  if (!isIcon) {
+    const caption = document.createElement('div');
+    caption.className = 'img-uploaded-caption editable-text';
+    caption.setAttribute('onclick', 'makeEditable(this)');
+    caption.textContent = isMultiple ? 'Gambar ' + startNum + ' - ' + (startNum + maxFiles.length - 1) : 'Gambar ' + startNum;
+    container.insertAdjacentElement('afterend', caption);
+    if (window.initEditableElements) {
+      window.initEditableElements();
+    }
+  }
+}
+
+
+async function downloadPDF(){
+  const btn=document.getElementById('dlBtn');
+  btn.disabled=true;
+  btn.textContent='⏳ Memproses...';
+
+  const {jsPDF}=window.jspdf;
+  const pages=document.querySelectorAll('.page');
+
+  // Standard A4 width (96 DPI)
+  const A4_W=794;
+  const A4_H=1122;
+
+  let pdf;
+
+  // Sembunyikan sementara semua placeholder KOSONG (belum di-upload) saat PDF
+  const emptyPlaceholders = Array.from(document.querySelectorAll('.img-placeholder:not(.has-image)'));
+  emptyPlaceholders.forEach(ph => {
+    ph._prevDisplay = ph.style.display;
+    ph.style.display = 'none';
+  });
+
+  for(let i=0;i<pages.length;i++){
+    btn.textContent=`⏳ Halaman ${i+1} / ${pages.length}...`;
+    const pg=pages[i];
+
+    // Simpan style visual asli
+    const prevW=pg.style.width;
+    const prevH=pg.style.height;
+    const prevOv=pg.style.overflow;
+
+    // Paksa agar elemen menyesuaikan lebar PDF dan tingginya otomatis menyesuaikan gambar
+    pg.style.width=A4_W+'px';
+    pg.style.height='auto';
+    pg.style.overflow='visible';
+
+    // Kalkulasi tinggi asli (berguna agar konten / gambar panjang tidak terpotong)
+    const actualH = Math.max(pg.scrollHeight, pg.offsetHeight, A4_H);
+
+    const canvas=await html2canvas(pg,{
+      scale:2, // Kualitas HD
+      useCORS:true,
+      logging:false,
+      backgroundColor:pg.classList.contains('page-cover')?coverBgColor:(pg.classList.contains('page-toc')?'#f8faff':'#ffffff'),
+      width:A4_W,
+      height:actualH,
+      windowWidth:A4_W
+    });
+
+    // Reset style
+    pg.style.width=prevW;
+    pg.style.height=prevH;
+    pg.style.overflow=prevOv;
+
+    // Buat format page secara dinamis (mengikuti actualH)
+    if(i===0){
+      pdf=new jsPDF({orientation:'portrait',unit:'px',format:[A4_W,actualH]});
+    }else{
+      pdf.addPage([A4_W,actualH],'px');
+    }
+
+    const imgData=canvas.toDataURL('image/jpeg',0.85);
+    pdf.addImage(imgData,'JPEG',0,0,A4_W,actualH);
+  }
+
+  pdf.save('Manual-Commandr-Signa-PhoneBank.pdf');
+
+  // Tampilkan kembali placeholder yang tadi disembunyikan
+  emptyPlaceholders.forEach(ph => {
+    ph.style.display = ph._prevDisplay || '';
+  });
+
+  btn.disabled=false;
+  btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download PDF';
+}
+
+// Inline Text Editor Logic
+document.addEventListener('DOMContentLoaded', () => {
+  const STORAGE_KEY = 'page_custom_edits_' + window.location.pathname;
+  let activeElement = null;
+  let savedEdits = {};
+
+  try {
+    savedEdits = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+  } catch (e) {
+    console.error('Failed to load saved edits', e);
+  }
+
+  // Create editor modal overlay and card
+  const overlay = document.createElement('div');
+  overlay.className = 'text-editor-overlay';
+  overlay.id = 'textEditorOverlay';
+  overlay.innerHTML = `
+    <div class="text-editor-card" onclick="event.stopPropagation()">
+      <div class="text-editor-header">
+        <div class="text-editor-title">Ubah Teks</div>
+        <button class="text-editor-close" id="textEditorClose">&times;</button>
+      </div>
+      <div class="text-editor-body">
+        <div class="text-editor-controls">
+          <label class="text-editor-control">
+            <span>Font</span>
+            <select id="fontSelect" class="text-editor-select">
+              <option value="Inter, sans-serif">Inter</option>
+              <option value="Playfair Display, serif">Playfair Display</option>
+              <option value="Arial, sans-serif">Arial</option>
+              <option value="Georgia, serif">Georgia</option>
+            </select>
+          </label>
+          <button type="button" class="text-editor-btn" id="boldBtn" title="Bold"><strong>B</strong></button>
+          <label class="text-editor-control text-editor-color-control">
+            <span>Warna</span>
+            <input type="color" id="textColorInput" class="text-editor-color" value="#1a202c">
+          </label>
+        </div>
+        <div id="textEditorInput" class="text-editor-textarea" contenteditable="true" role="textbox" spellcheck="true" placeholder="Ketik teks di sini..."></div>
+        <div class="text-editor-hint">Klik <strong>Bold</strong> untuk menebalkan semua teks bila belum diseleksi. Tekan <strong>Enter</strong> untuk menyimpan, <strong>Shift + Enter</strong> untuk baris baru. Tekan <strong>Esc</strong> untuk batal.</div>
+      </div>
+      <div class="text-editor-footer">
+        <button class="btn-editor btn-editor-cancel" id="textEditorCancel">Batal</button>
+        <button class="btn-editor btn-editor-save" id="textEditorSave">Simpan</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  const textInput = document.getElementById('textEditorInput');
+  const fontSelect = document.getElementById('fontSelect');
+  const boldBtn = document.getElementById('boldBtn');
+  const textColorInput = document.getElementById('textColorInput');
+  const closeBtn = document.getElementById('textEditorClose');
+  const cancelBtn = document.getElementById('textEditorCancel');
+  const saveBtn = document.getElementById('textEditorSave');
+
+  const rgbToHex = (rgb) => {
+    const match = rgb.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/i);
+    if (!match) return '#1a202c';
+    const [, r, g, b] = match;
+    return `#${((1 << 24) + (parseInt(r) << 16) + (parseInt(g) << 8) + parseInt(b)).toString(16).slice(1)}`;
+  };
+
+  const placeCaretAtEnd = (el) => {
+    el.focus();
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    range.collapse(false);
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+  };
+
+  const updateBoldButtonState = () => {
+    const selection = window.getSelection();
+    const isInEditor = selection.anchorNode && textInput.contains(selection.anchorNode);
+    const hasContent = textInput.innerText.trim().length > 0;
+    boldBtn.disabled = !hasContent;
+  };
+
+  const applyTextColor = (color) => {
+    const selection = window.getSelection();
+    const isInEditor = selection.anchorNode && textInput.contains(selection.anchorNode);
+    if (isInEditor && !selection.isCollapsed) {
+      document.execCommand('foreColor', false, color);
+    } else if (activeElement) {
+      activeElement.style.color = color;
+    }
+  };
+
+  const applyFontFamily = (fontFamily) => {
+    const selection = window.getSelection();
+    const isInEditor = selection.anchorNode && textInput.contains(selection.anchorNode);
+    if (isInEditor && !selection.isCollapsed) {
+      document.execCommand('fontName', false, fontFamily);
+    } else if (activeElement) {
+      activeElement.style.fontFamily = fontFamily;
+    }
+    textInput.style.fontFamily = fontFamily;
+  };
+
+  const wrapWholeEditorWithStrong = () => {
+    const content = textInput.innerHTML.trim();
+    if (!content) return;
+    const alreadyBold = textInput.childNodes.length === 1 && textInput.firstChild.nodeType === 1 && textInput.firstChild.tagName === 'STRONG';
+    if (!alreadyBold) {
+      textInput.innerHTML = `<strong>${content}</strong>`;
+    }
+  };
+
+  boldBtn.addEventListener('click', () => {
+    const selection = window.getSelection();
+    const isInEditor = selection.anchorNode && textInput.contains(selection.anchorNode);
+    if (!isInEditor || selection.isCollapsed) {
+      wrapWholeEditorWithStrong();
+    } else {
+      document.execCommand('bold');
+    }
+    updateBoldButtonState();
+  });
+
+  fontSelect.addEventListener('change', () => applyFontFamily(fontSelect.value));
+  textColorInput.addEventListener('input', (e) => applyTextColor(e.target.value));
+
+  textInput.addEventListener('mouseup', updateBoldButtonState);
+  textInput.addEventListener('keyup', updateBoldButtonState);
+  textInput.addEventListener('focus', updateBoldButtonState);
+
+  // Find all elements to make editable
+  const getEditableElements = () => {
+    const selector = [
+      '.cover-badge', '.cover-eyebrow', '.cover-title', '.cover-sub', '.cover-year', '.cover-desc', '.cover-logo-text', '.cover-version',
+      '.section-label', '.toc-title', '.toc-num', '.toc-name', '.toc-page',
+      '.chapter-num', '.chapter-label', '.chapter-name', '.page-num-tag',
+      '.section-title', '.body-text', '.body-subtitle', '.step-text', '.badge', '.feature-card-title', '.feature-card-desc',
+      '.footer-brand', '.footer-page', '.ph-label', '.ph-sub', '.tag-ews', '.toc-num', '.toc-page',
+      '.img-uploaded-caption', '.img-grid-caption',
+      'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'td', 'th'
+    ].join(', ');
+    
+    // Select elements inside the pdfPages
+    const elements = Array.from(document.querySelectorAll('#pdfPages ' + selector));
+    
+    // Filter out elements that don't have text content or contain major containers
+    return elements.filter(el => {
+      const hasText = el.innerText && el.innerText.trim().length > 0;
+      const isContainer = el.classList.contains('page') || el.classList.contains('pdf-pages') || el.classList.contains('img-placeholder') || el.classList.contains('img-preview-grid');
+      // Allow step-text and body-text that contain img-placeholder icons — only block if the element itself IS a placeholder
+      const isStepOrBody = el.classList.contains('step-text') || el.classList.contains('body-text');
+      const hasFileInput = !isStepOrBody && el.querySelector('input[type="file"]');
+      return hasText && !isContainer && !hasFileInput;
+    });
+  };
+
+  // Assign IDs and restore saved text
+  let editableElementCounter = 0;
+  window.initEditableElements = () => {
+    const editableElements = getEditableElements();
+    editableElements.forEach(el => {
+      let id = el.getAttribute('data-editable-id');
+      if (!id) {
+        id = 'edit-' + editableElementCounter++;
+        el.setAttribute('data-editable-id', id);
+      }
+      el.classList.add('editable-text');
+      
+      // Store default text in a property if not already set, to support resetting
+      if (!el.hasOwnProperty('_defaultHTML')) {
+        el._defaultHTML = el.innerHTML;
+      }
+      
+      // If there is a saved edit, restore it
+      if (savedEdits[id] !== undefined) {
+        applyNewText(el, savedEdits[id]);
+      }
+    });
+  };
+
+  const applyNewText = (el, text) => {
+    // Preserve img-placeholder children (icon uploads) and body-cite spans
+    const preservedEls = Array.from(el.querySelectorAll('.img-placeholder, .body-cite'));
+    const preserved = preservedEls.map(child => ({
+      el: child,
+      html: child.outerHTML
+    }));
+    
+    let newHTML = text.trim();
+    const isHtml = /<[a-z][\s\S]*>/i.test(newHTML);
+    if (!isHtml) {
+      newHTML = newHTML.replace(/[\n\r]+/g, '<br>');
+    }
+    
+    preserved.forEach(item => {
+      newHTML += ' ' + item.html;
+    });
+    
+    el.innerHTML = newHTML;
+  };
+
+  window.initEditableElements();
+
+  // Handle clicks to edit
+  document.addEventListener('click', (e) => {
+    const target = e.target.closest('.editable-text');
+    if (target && document.getElementById('pdfPages').contains(target)) {
+      // Do not trigger if clicking on inputs, buttons, or links
+      if (['INPUT', 'BUTTON', 'A', 'TEXTAREA'].includes(e.target.tagName)) return;
+      
+      e.preventDefault();
+      e.stopPropagation();
+      
+      activeElement = target;
+      activeElement.classList.add('editing-now');
+      
+      // Extract clean text to edit (removing citation, img-placeholder text, etc.)
+      const clone = target.cloneNode(true);
+      clone.querySelectorAll('.body-cite, .img-placeholder, .element-controls').forEach(child => child.remove());
+      let cleanText = clone.innerHTML.trim();
+      
+      const isHtml = /<[a-z][\s\S]*>/i.test(cleanText);
+      if (!isHtml) {
+        cleanText = cleanText.replace(/\n/g, '<br>');
+      }
+
+      textInput.innerHTML = cleanText;
+      overlay.classList.add('show');
+      
+      const computedStyle = window.getComputedStyle(activeElement);
+      const fontFamily = computedStyle.fontFamily;
+      if (/Playfair/i.test(fontFamily)) {
+        fontSelect.value = 'Playfair Display, serif';
+      } else if (/Georgia/i.test(fontFamily)) {
+        fontSelect.value = 'Georgia, serif';
+      } else if (/Arial/i.test(fontFamily)) {
+        fontSelect.value = 'Arial, sans-serif';
+      } else {
+        fontSelect.value = 'Inter, sans-serif';
+      }
+      applyFontFamily(fontSelect.value);
+      textColorInput.value = rgbToHex(computedStyle.color);
+      applyTextColor(textColorInput.value);
+      
+      // Focus and position cursor
+      setTimeout(() => {
+        placeCaretAtEnd(textInput);
+        updateBoldButtonState();
+      }, 50);
+    }
+  });
+
+  const closeEditor = () => {
+    overlay.classList.remove('show');
+    if (activeElement) {
+      activeElement.classList.remove('editing-now');
+      activeElement = null;
+    }
+  };
+
+  const saveEdit = () => {
+    if (activeElement) {
+      const id = activeElement.getAttribute('data-editable-id');
+      const textValue = textInput.innerHTML.trim();
+      
+      applyNewText(activeElement, textValue);
+      
+      // Save to localStorage
+      savedEdits[id] = textValue;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(savedEdits));
+      // Refresh sidebar titles immediately
+      if (typeof populateSidebarPages === 'function') populateSidebarPages();
+    }
+    closeEditor();
+  };
+
+  // Reset function exposed globally
+  window.resetAllEdits = () => {
+    if (confirm('Apakah Anda yakin ingin mengembalikan semua teks manual ke setelan default?')) {
+      const editableElements = getEditableElements();
+      editableElements.forEach(el => {
+        if (el._defaultHTML !== undefined) {
+          el.innerHTML = el._defaultHTML;
+        }
+      });
+      savedEdits = {};
+      localStorage.removeItem(STORAGE_KEY);
+      if (typeof populateSidebarPages === 'function') populateSidebarPages();
+      alert('Teks manual telah berhasil di-reset ke default.');
+    }
+  };
+
+  // Close editor on escape, save on enter without shift
+  textInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      saveEdit();
+    } else if (e.key === 'Escape') {
+      closeEditor();
+    }
+  });
+
+  closeBtn.addEventListener('click', closeEditor);
+  cancelBtn.addEventListener('click', closeEditor);
+  saveBtn.addEventListener('click', saveEdit);
+  overlay.addEventListener('click', closeEditor);
+  // Tutup handler JS lainnya
+});
+
+// Update semua nomor halaman yang sudah ada agar hanya menampilkan angka saja
+document.addEventListener('DOMContentLoaded', () => {
+  const pages = document.querySelectorAll('.page');
+  pages.forEach((page, index) => {
+    const footerPage = page.querySelector('.footer-page');
+    if (footerPage) {
+      footerPage.textContent = (index + 1);
+    }
+  });
+});
+
+function addNewPage() {
+  const container = document.getElementById('pdfPages');
+  const pages = container.querySelectorAll('.page');
+  const newPageNum = pages.length + 1;
+  const newPageId = 'p' + newPageNum;
+  
+  const newPageHTML = `
+    <div class="page page-content" id="${newPageId}">
+        <div class="page-header">
+            <div class="page-header-left">
+                <div class="chapter-num">X</div>
+                <div class="chapter-info">
+                    <div class="chapter-label">Judul Bab</div>
+                    <div class="chapter-name">Nama Bab</div>
+                </div>
+            </div>
+        <div class="page-num-tag">Halaman ${newPageNum < 10 ? '0'+newPageNum : newPageNum}</div>
+        </div>
+
+        <!-- Kertas kosong -->
+        <p class="body-text">...</p>
+
+        <div class="page-footer">
+            <div class="footer-brand">Commandr Signa PhoneBank</div>
+            <div class="footer-page">${newPageNum}</div>
+        </div>
+    </div>
+  `;
+  
+  // Insert new page at the end of pdfPages
+  container.insertAdjacentHTML('beforeend', newPageHTML);
+  
+  // Setup drop zones for the new page
+  if(window.setupDropZones) {
+    window.setupDropZones();
+  }
+  
+  // Make new elements editable
+  if(window.initEditableElements) {
+    window.initEditableElements();
+  }
+
+  // Refresh sidebar page list so the new page appears immediately
+  if (typeof populateSidebarPages === 'function') {
+    populateSidebarPages();
+  }
+  
+  // Scroll to the new page
+  const newPageEl = document.getElementById(newPageId);
+  if(newPageEl) {
+    newPageEl.scrollIntoView({ behavior: 'smooth' });
+  }
+}
+
+// ═══════════════ SIDEBAR FUNCTIONS ═══════════════
+function toggleSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  const toggleBtn = document.getElementById('sidebarToggleBtn');
+  const pdfPages = document.getElementById('pdfPages');
+  
+  sidebar.classList.toggle('open');
+  pdfPages.classList.toggle('sidebar-open');
+  
+  if (window.innerWidth <= 768) {
+    if (sidebar.classList.contains('open')) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'auto';
+    }
+  }
+}
+
+function filterSidebarItems() {
+  const searchInput = document.getElementById('sidebarSearch');
+  const sidebarPages = document.getElementById('sidebarPages');
+  const sidebarSearchResults = document.getElementById('sidebarSearchResults');
+  const searchTerm = searchInput.value.toLowerCase().trim();
+
+  // If empty, show page list
+  if (!searchTerm) {
+    populateSidebarPages();
+    sidebarSearchResults.innerHTML = '<div class="sidebar-empty">Mulai ketik untuk mencari...</div>';
+    return;
+  }
+
+  const allPages = document.querySelectorAll('.page');
+  const searchResults = [];
+  let resultCount = 0;
+
+  allPages.forEach((page, pageIndex) => {
+    const pageNum = pageIndex + 1;
+    const textElements = page.querySelectorAll('.body-text, .step-text, .section-title, .body-subtitle, .editable-text, strong, p');
+
+    textElements.forEach(el => {
+      const text = el.innerText || el.textContent;
+      if (text && text.toLowerCase().includes(searchTerm) && resultCount < 50) {
+        const snippet = text.substring(0, 50).trim() + (text.length > 50 ? '...' : '');
+        searchResults.push({
+          text: snippet,
+          pageNum: pageNum,
+          element: el,
+          fullText: text
+        });
+        resultCount++;
+      }
+    });
+  });
+
+  if (searchResults.length === 0) {
+    sidebarSearchResults.innerHTML = '<div class="sidebar-empty">Tidak ada hasil ditemukan</div>';
+    return;
+  }
+
+  let html = '';
+  searchResults.forEach((result, idx) => {
+    html += `
+      <div class="sidebar-item" onclick="scrollToResult(${result.pageNum}, this)" title="${result.fullText}">
+        <div class="sidebar-item-title">${result.text}</div>
+        <div class="sidebar-item-page">Hal ${result.pageNum}</div>
+      </div>
+    `;
+  });
+
+  sidebarSearchResults.innerHTML = html;
+}
+
+function populateSidebarPages() {
+  const sidebarPages = document.getElementById('sidebarPages');
+  if (!sidebarPages) return;
+  const pages = document.querySelectorAll('.page');
+  if (!pages || pages.length === 0) {
+    sidebarPages.innerHTML = '<div class="sidebar-empty">Tidak ada kertas</div>';
+    return;
+  }
+
+  let items = [];
+
+  // Always add Page 1 (Cover) if it exists
+  const page1 = pages[0];
+  if (page1) {
+    let coverTitleEl = page1.querySelector('.cover-title, .chapter-name, .sec-title, h1, h2');
+    let coverTitle = coverTitleEl ? (coverTitleEl.innerText || coverTitleEl.textContent).trim() : 'Sampul';
+    coverTitle = coverTitle.replace(/\s+/g, ' ').trim();
+    if (coverTitle.length > 45) coverTitle = coverTitle.substring(0, 42) + '...';
+    items.push({
+      title: `1. ${coverTitle}`,
+      pageNum: 1
+    });
+  }
+
+  // Check for Table of Contents page / elements
+  const tocPage = document.querySelector('.page-toc, #page-page-toc, #p2');
+  const tocItems = document.querySelectorAll('.toc-list .toc-item, .toc-container > div');
+
+  if (tocPage && page1 !== tocPage) {
+    let tocTitleEl = tocPage.querySelector('.toc-title, .chapter-name');
+    let tocTitle = tocTitleEl ? (tocTitleEl.innerText || tocTitleEl.textContent).trim() : 'Daftar Isi';
+    items.push({
+      title: `2. ${tocTitle}`,
+      pageNum: 2
+    });
+  }
+
+  let foundTocEntries = false;
+
+  if (tocItems && tocItems.length > 0) {
+    tocItems.forEach((item) => {
+      // Pattern A: .toc-item
+      const tocNameEl = item.querySelector('.toc-name');
+      const tocNumEl = item.querySelector('.toc-num');
+      const tocPageEl = item.querySelector('.toc-page');
+
+      if (tocNameEl) {
+        let name = (tocNameEl.innerText || tocNameEl.textContent).trim();
+        let num = tocNumEl ? (tocNumEl.innerText || tocNumEl.textContent).trim() : '';
+        let pageStr = tocPageEl ? (tocPageEl.innerText || tocPageEl.textContent).trim() : '';
+        let targetPage = parseInt(pageStr, 10);
+        if (isNaN(targetPage)) targetPage = items.length + 1;
+
+        let display = num ? `${num}. ${name}` : name;
+        if (display.length > 50) display = display.substring(0, 47) + '...';
+
+        items.push({
+          title: display,
+          pageNum: targetPage
+        });
+        foundTocEntries = true;
+      } else {
+        // Pattern B: .toc-container > div (docx importer)
+        const spans = item.querySelectorAll('span');
+        if (spans.length >= 2) {
+          let title = (spans[0].innerText || spans[0].textContent).trim();
+          if (title.startsWith('•')) return;
+          let pageStr = (spans[1].innerText || spans[1].textContent).trim();
+          let targetPage = parseInt(pageStr, 10);
+          if (isNaN(targetPage)) targetPage = items.length + 1;
+
+          if (title) {
+            if (title.length > 50) title = title.substring(0, 47) + '...';
+            items.push({
+              title: title,
+              pageNum: targetPage
+            });
+            foundTocEntries = true;
+          }
+        }
+      }
+    });
+  }
+
+  // Fallback: If no TOC entries were extracted, extract titles from all pages
+  if (!foundTocEntries) {
+    items = [];
+    pages.forEach((page, i) => {
+      const pageNum = i + 1;
+      let titleEl = page.querySelector('.sec-title, .cover-title, .toc-title, .chapter-name, .section-title, .body-subtitle, h1, h2, h3, h4');
+      let titleText = titleEl ? (titleEl.innerText || titleEl.textContent).trim() : '';
+      if (!titleText) {
+        const firstText = page.querySelector('.body-text, .body-subtitle, p, .step-text, .toc-name');
+        titleText = firstText ? ((firstText.innerText || firstText.textContent).trim().substring(0, 50)) : `Kertas ${pageNum}`;
+      }
+      titleText = titleText.replace(/\s+/g, ' ').trim();
+      if (titleText.length > 50) titleText = titleText.substring(0, 47) + '...';
+
+      items.push({
+        title: `${pageNum}. ${titleText}`,
+        pageNum: pageNum
+      });
+    });
+  }
+
+  // Render items into sidebarPages
+  let html = '';
+  items.forEach((item) => {
+    html += `
+  <div class="sidebar-item" onclick="scrollToResult(${item.pageNum}, this)" title="${item.title}">
+    <div class="sidebar-item-title">${item.title}</div>
+    <div class="sidebar-item-page">Hal ${item.pageNum}</div>
+  </div>
+`;
+  });
+
+  sidebarPages.innerHTML = html;
+}
+
+function scrollToResult(pageNum, element) {
+  const pages = document.querySelectorAll('.page');
+  const page = pages[pageNum - 1] || document.getElementById('p' + pageNum) || document.getElementById('page-' + pageNum) || document.getElementById('page-p' + pageNum);
+  if (page) {
+    document.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('active'));
+    if (element) element.classList.add('active');
+    page.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (window.innerWidth <= 768) {
+      const sidebar = document.getElementById('sidebar');
+      if (sidebar) sidebar.classList.remove('open');
+      document.body.style.overflow = 'auto';
+    }
+  }
+}
+
+// Initialize sidebar on page load
+window.addEventListener('load', function() {
+  const sidebar = document.getElementById('sidebar');
+  const pdfPages = document.getElementById('pdfPages');
+  const toggleBtn = document.getElementById('sidebarToggleBtn');
+  const components = document.getElementById('componentsSidebar');
+  
+  // Desktop: keep sidebar open by default
+  if (window.innerWidth > 768) {
+    sidebar.classList.add('open');
+    pdfPages.classList.add('sidebar-open');
+    if (components) {
+      components.classList.add('open');
+      pdfPages.classList.add('components-sidebar-open');
+    }
+  }
+  // Populate pages list
+  if (typeof populateSidebarPages === 'function') populateSidebarPages();
+  // Toggle button visibility
+  if (toggleBtn) {
+    if (window.innerWidth <= 768) toggleBtn.classList.add('show');
+    else toggleBtn.classList.remove('show');
+  }
+});
+
+// Handle window resize
+window.addEventListener('resize', function() {
+  const sidebar = document.getElementById('sidebar');
+  const pdfPages = document.getElementById('pdfPages');
+  const toggleBtn = document.getElementById('sidebarToggleBtn');
+  const components = document.getElementById('componentsSidebar');
+  
+  if (window.innerWidth > 768) {
+    sidebar.classList.add('open');
+    pdfPages.classList.add('sidebar-open');
+    if (components) {
+      components.classList.add('open');
+      pdfPages.classList.add('components-sidebar-open');
+    }
+    toggleBtn.classList.remove('show');
+  } else {
+    sidebar.classList.remove('open');
+    pdfPages.classList.remove('sidebar-open');
+    if (components) {
+      components.classList.remove('open');
+      pdfPages.classList.remove('components-sidebar-open');
+    }
+    toggleBtn.classList.add('show');
+  }
+});
+
+// Close sidebar when clicking outside on mobile
+document.addEventListener('click', function(e) {
+  if (window.innerWidth <= 768) {
+    const sidebar = document.getElementById('sidebar');
+    const toggleBtn = document.getElementById('sidebarToggleBtn');
+    
+    if (sidebar.classList.contains('open') && !sidebar.contains(e.target) && !toggleBtn.contains(e.target)) {
+      sidebar.classList.remove('open');
+      document.body.style.overflow = 'auto';
+    }
+  }
+});
+</script>
+
+<button class="btn-add-page-fab" onclick="addNewPage()" title="Tambah Kertas Baru">
+  +
+</button>
+
+</body>
+</html>
